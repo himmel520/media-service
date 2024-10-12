@@ -1,0 +1,798 @@
+basePath: /api/v1
+definitions:
+  httphandler.errorResponse:
+    properties:
+      message:
+        type: string
+    type: object
+  models.Adv:
+    properties:
+      color_id:
+        minimum: 1
+        type: integer
+      description:
+        maxLength: 150
+        minLength: 10
+        type: string
+      id:
+        type: integer
+      logo_id:
+        minimum: 1
+        type: integer
+      post:
+        maxLength: 100
+        minLength: 3
+        type: string
+      priority:
+        maximum: 3
+        minimum: 1
+        type: integer
+      tg_id:
+        minimum: 1
+        type: integer
+      title:
+        maxLength: 40
+        minLength: 3
+        type: string
+    required:
+    - color_id
+    - description
+    - logo_id
+    - post
+    - priority
+    - tg_id
+    - title
+    type: object
+  models.AdvResponse:
+    properties:
+      description:
+        type: string
+      hex:
+        type: string
+      id:
+        type: integer
+      logo_url:
+        type: string
+      post:
+        type: string
+      priority:
+        type: integer
+      tg_url:
+        type: string
+      title:
+        type: string
+    type: object
+  models.AdvUpdate:
+    properties:
+      color_id:
+        minimum: 1
+        type: integer
+      description:
+        maxLength: 150
+        minLength: 10
+        type: string
+      logo_id:
+        minimum: 1
+        type: integer
+      post:
+        maxLength: 100
+        minLength: 3
+        type: string
+      priority:
+        maximum: 3
+        minimum: 1
+        type: integer
+      tg_id:
+        minimum: 1
+        type: integer
+      title:
+        maxLength: 40
+        minLength: 3
+        type: string
+    type: object
+  models.Color:
+    properties:
+      hex:
+        maxLength: 7
+        minLength: 7
+        type: string
+      id:
+        type: integer
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    required:
+    - hex
+    - title
+    type: object
+  models.ColorResp:
+    properties:
+      hex:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.ColorUpdate:
+    properties:
+      hex:
+        maxLength: 7
+        minLength: 7
+        type: string
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+    type: object
+  models.ColorsResp:
+    properties:
+      colors:
+        items:
+          $ref: '#/definitions/models.ColorResp'
+        type: array
+      total:
+        type: integer
+    type: object
+  models.Logo:
+    properties:
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+      url:
+        minLength: 3
+        type: string
+    required:
+    - title
+    - url
+    type: object
+  models.LogoResp:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  models.LogoUpdate:
+    properties:
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+      url:
+        minLength: 3
+        type: string
+    type: object
+  models.LogosResp:
+    properties:
+      logos:
+        additionalProperties:
+          $ref: '#/definitions/models.Logo'
+        type: object
+      total:
+        type: integer
+    type: object
+  models.TG:
+    properties:
+      id:
+        type: integer
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+      url:
+        minLength: 3
+        type: string
+    required:
+    - title
+    - url
+    type: object
+  models.TGResp:
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      url:
+        type: string
+    type: object
+  models.TGUpdate:
+    properties:
+      title:
+        maxLength: 100
+        minLength: 3
+        type: string
+      url:
+        minLength: 3
+        type: string
+    type: object
+  models.TGsResp:
+    properties:
+      tgs:
+        items:
+          $ref: '#/definitions/models.TGResp'
+        type: array
+      total:
+        type: integer
+    type: object
+host: localhost:8081
+info:
+  contact: {}
+  description: API для сервиса медиа и рекламы
+  title: API Documentation
+  version: "1.0"
+paths:
+  /admin/ads:
+    post:
+      consumes:
+      - application/json
+      description: Создает новое объявление на основе переданных данных
+      parameters:
+      - description: Объявление
+        in: body
+        name: adv
+        required: true
+        schema:
+          $ref: '#/definitions/models.Adv'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешное создание объявления
+          schema:
+            $ref: '#/definitions/models.AdvResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "409":
+          description: Конфликт данных
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Добавить новое объявление
+      tags:
+      - adv
+  /admin/ads/{id}:
+    delete:
+      description: Удаляет объявление по его id
+      parameters:
+      - description: id объявления
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Успешное удаление
+        "404":
+          description: Объявление не найдено
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Удалить объявление
+      tags:
+      - adv
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующее объявление
+      parameters:
+      - description: id объявления
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленное объявление
+        in: body
+        name: adv
+        required: true
+        schema:
+          $ref: '#/definitions/models.AdvUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное обновление объявления
+          schema:
+            $ref: '#/definitions/models.AdvResponse'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Объявление не найдено
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "409":
+          description: Конфликт данных
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Обновить объявление
+      tags:
+      - adv
+  /admin/colors:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый цвет
+      parameters:
+      - description: Цвет
+        in: body
+        name: color
+        required: true
+        schema:
+          $ref: '#/definitions/models.Color'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешное создание цвета
+          schema:
+            $ref: '#/definitions/models.ColorResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Добавить новый цвет
+      tags:
+      - colors
+  /admin/colors/{id}:
+    delete:
+      description: Удаляет цвет по его идентификатору
+      parameters:
+      - description: id цвета
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Успешное удаление
+        "404":
+          description: Цвет не найден
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "409":
+          description: Конфликт данных
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Удалить цвет
+      tags:
+      - colors
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующий цвет
+      parameters:
+      - description: id цвета
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленный цвет
+        in: body
+        name: color
+        required: true
+        schema:
+          $ref: '#/definitions/models.ColorUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное обновление цвета
+          schema:
+            $ref: '#/definitions/models.ColorResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Цвет не найден
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Обновить цвет
+      tags:
+      - colors
+  /admin/logos:
+    post:
+      consumes:
+      - application/json
+      description: Создает новый логотип
+      parameters:
+      - description: Логотип
+        in: body
+        name: logo
+        required: true
+        schema:
+          $ref: '#/definitions/models.Logo'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешное создание логотипа
+          schema:
+            $ref: '#/definitions/models.LogoResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Добавить новый логотип
+      tags:
+      - logos
+  /admin/logos/{id}:
+    delete:
+      description: Удаляет логотип по его id
+      parameters:
+      - description: id логотипа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Успешное удаление
+        "404":
+          description: Логотип не найден
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "409":
+          description: Конфликт данных
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Удалить логотип
+      tags:
+      - logos
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующий логотип
+      parameters:
+      - description: id логотипа
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленный логотип
+        in: body
+        name: logo
+        required: true
+        schema:
+          $ref: '#/definitions/models.LogoUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное обновление логотипа
+          schema:
+            $ref: '#/definitions/models.LogoResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Логотип не найден
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Обновить логотип
+      tags:
+      - logos
+  /admin/tgs:
+    get:
+      description: Возвращает список всех групп Telegram с учетом пагинации
+      parameters:
+      - in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список групп Telegram
+          schema:
+            $ref: '#/definitions/models.TGsResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Группы Telegram не найдены
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Получить список групп Telegram
+      tags:
+      - tg
+    post:
+      consumes:
+      - application/json
+      description: Создает новую группу Telegram
+      parameters:
+      - description: Группа Telegram
+        in: body
+        name: tg
+        required: true
+        schema:
+          $ref: '#/definitions/models.TG'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешное создание группы
+          schema:
+            $ref: '#/definitions/models.TGResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Добавить группу Telegram
+      tags:
+      - tg
+  /admin/tgs/{id}:
+    delete:
+      description: Удаляет группу Telegram по ее id
+      parameters:
+      - description: idгруппы Telegram
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Успешное удаление
+        "404":
+          description: Группа Telegram не найдена
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "409":
+          description: Конфликт данных
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Удалить группу Telegram
+      tags:
+      - tg
+    put:
+      consumes:
+      - application/json
+      description: Обновляет существующую группу Telegram
+      parameters:
+      - description: id группы Telegram
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Обновленная группа Telegram
+        in: body
+        name: tg
+        required: true
+        schema:
+          $ref: '#/definitions/models.TGUpdate'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешное обновление группы
+          schema:
+            $ref: '#/definitions/models.TGResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Группа Telegram не найдена
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Обновить группу Telegram
+      tags:
+      - tg
+  /ads:
+    get:
+      description: Возвращает список объявлений с возможностью фильтрации
+      parameters:
+      - in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        minimum: 0
+        name: offset
+        type: integer
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: post
+        required: true
+        type: array
+      - collectionFormat: csv
+        in: query
+        items:
+          type: string
+        name: priority
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список объявлений
+          schema:
+            items:
+              $ref: '#/definitions/models.AdvResponse'
+            type: array
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Объявления не найдены
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Получить объявления с фильтрацией
+      tags:
+      - adv
+  /colors:
+    get:
+      description: Возвращает список всех цветов с учетом пагинации
+      parameters:
+      - in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список цветов
+          schema:
+            $ref: '#/definitions/models.ColorsResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Цвета не найдены
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Получить список цветов
+      tags:
+      - colors
+  /logos:
+    get:
+      description: Возвращает список всех логотипов с учетом пагинации.
+      parameters:
+      - in: query
+        minimum: 1
+        name: limit
+        type: integer
+      - in: query
+        minimum: 0
+        name: offset
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список логотипов
+          schema:
+            $ref: '#/definitions/models.LogosResp'
+        "400":
+          description: Неверные данные
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "404":
+          description: Логотипы не найдены
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Получить список логотипов
+      tags:
+      - logos
+  /logos/{id}:
+    get:
+      description: Возвращает логотип по его id
+      parameters:
+      - description: id логотипа
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Логотип
+          schema:
+            $ref: '#/definitions/models.LogoResp'
+        "404":
+          description: Логотип не найден
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/httphandler.errorResponse'
+      summary: Получить логотип
+      tags:
+      - logos
+swagger: "2.0"

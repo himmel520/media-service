@@ -1,0 +1,4 @@
+.DS_Store
+**/*.key
+**/.env
+pg_media_data
