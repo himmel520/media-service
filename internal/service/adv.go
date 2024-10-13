@@ -12,6 +12,8 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/models"
 )
 
+// аналогично с прошлым микросом - можно заменить две команды ниже на одну - set
+// для того что бы сделать операцию идемпотентной
 func (s *Service) AddAdv(ctx context.Context, adv *models.Adv) (*models.AdvResponse, error) {
 	id, err := s.repo.AddAdv(ctx, adv)
 	if err != nil {
@@ -19,10 +21,6 @@ func (s *Service) AddAdv(ctx context.Context, adv *models.Adv) (*models.AdvRespo
 	}
 
 	return s.repo.GetAdvByID(ctx, id)
-}
-
-func (s *Service) DeleteAdv(ctx context.Context, id int) error {
-	return s.repo.DeleteAdv(ctx, id)
 }
 
 func (s *Service) UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) (*models.AdvResponse, error) {
@@ -33,9 +31,13 @@ func (s *Service) UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) 
 	return s.repo.GetAdvByID(ctx, id)
 }
 
+func (s *Service) DeleteAdv(ctx context.Context, id int) error {
+	return s.repo.DeleteAdv(ctx, id)
+}
+
 func (s *Service) GetAdvsWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error) {
 	key := s.generateCacheKey(limit, offset, posts, priority)
-	
+
 	advs, err := s.cache.GetAdv(ctx, key)
 	if err != nil {
 		if !errors.Is(err, repository.ErrKeyNotFound) {
@@ -57,7 +59,7 @@ func (s *Service) GetAdvsWithFilter(ctx context.Context, limit, offset int, post
 	return advs, nil
 }
 
-func(s *Service) DeleteAdvsCache(ctx context.Context) error {
+func (s *Service) DeleteAdvsCache(ctx context.Context) error {
 	return s.cache.DeleteAdvsCache(ctx)
 }
 

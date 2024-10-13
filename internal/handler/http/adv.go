@@ -29,6 +29,7 @@ func (h *Handler) addAdv(c *gin.Context) {
 	}
 
 	advResp, err := h.srv.AddAdv(c.Request.Context(), adv)
+	// однотипная логика, наверное можно вынести и в цикле проверять на errIs
 	switch {
 	case errors.Is(err, repository.ErrAdvDependencyNotExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -54,6 +55,7 @@ func (h *Handler) deleteAdv(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.srv.DeleteAdv(c.Request.Context(), id)
+	// однотипная логика, наверное можно вынести
 	switch {
 	case errors.Is(err, repository.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

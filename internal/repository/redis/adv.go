@@ -9,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
+// как раз хороший пример индепотентной операции
 func (r *Redis) SetAdv(ctx context.Context, key string, advs []*models.AdvResponse) error {
 	advsByte, err := json.Marshal(advs)
 	if err != nil {
@@ -46,6 +47,6 @@ func (r *Redis) DeleteAdvsCache(ctx context.Context) error {
 			return err
 		}
 	}
-	
+
 	return nil
 }

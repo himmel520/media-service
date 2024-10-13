@@ -10,7 +10,6 @@ import (
 type (
 	Repo interface {
 		Logo
-
 		Color
 		TG
 		Adv
@@ -48,24 +47,24 @@ type (
 		UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) error
 		GetAdvsWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error)
 	}
+
+	Cache interface {
+		SetAdv(ctx context.Context, key string, advs []*models.AdvResponse) error
+		GetAdv(ctx context.Context, key string) ([]*models.AdvResponse, error)
+		DeleteAdvsCache(ctx context.Context) error
+	}
+
+	Service struct {
+		repo  Repo
+		cache Cache
+		log   *logrus.Logger
+	}
 )
-
-type Cache interface {
-	SetAdv(ctx context.Context, key string, advs []*models.AdvResponse) error
-	GetAdv(ctx context.Context, key string) ([]*models.AdvResponse, error)
-	DeleteAdvsCache(ctx context.Context) error
-}
-
-type Service struct {
-	repo  Repo
-	cache Cache
-	log *logrus.Logger
-}
 
 func New(repo Repo, cache Cache, log *logrus.Logger) *Service {
 	return &Service{
 		repo:  repo,
 		cache: cache,
-		log: log,
+		log:   log,
 	}
 }

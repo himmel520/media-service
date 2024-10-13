@@ -29,13 +29,13 @@ type (
 		Conn string
 		Exp  time.Duration
 	}
-)
 
-type Config struct {
-	Srv   Server
-	DB    Database
-	Cache Cache
-}
+	Config struct {
+		Srv   Server
+		DB    Database
+		Cache Cache
+	}
+)
 
 func New() (*Config, error) {
 	viper.AutomaticEnv()

@@ -12,14 +12,16 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
+// получается так что у тебя имея доступ к *Repository можно любые запросы к базе сделать для любой сущности
+// в идеале что то типа LogoRepository
 func (r *Repository) AddLogo(ctx context.Context, logo *models.Logo) (*models.LogoResp, error) {
 	newLogo := &models.LogoResp{}
 
 	err := r.DB.QueryRow(ctx, `
-	insert into logos 
-		(url, title) 
-	values 
-		($1, $2) 
+	insert into logos
+		(url, title)
+	values
+		($1, $2)
 	returning *`, logo.Url, logo.Title).Scan(&newLogo.ID, &newLogo.Url, &newLogo.Title)
 
 	var pgErr *pgconn.PgError
@@ -45,8 +47,8 @@ func (r *Repository) UpdateLogo(ctx context.Context, id int, logo *models.LogoUp
 
 	values = append(values, id)
 	query := fmt.Sprintf(`
-	update logos 
-		set %v 
+	update logos
+		set %v
 	where id = $%v
 	returning *;`, strings.Join(keys, ", "), len(values))
 
@@ -68,7 +70,7 @@ func (r *Repository) DeleteLogo(ctx context.Context, id int) error {
 	var pgErr *pgconn.PgError
 
 	cmdTag, err := r.DB.Exec(ctx, `
-	delete from logos 
+	delete from logos
 		where id = $1`, id)
 	if errors.As(err, &pgErr) {
 		if pgErr.Code == repository.FKViolation {
@@ -87,7 +89,7 @@ func (r *Repository) GetLogo(ctx context.Context, id int) (*models.LogoResp, err
 	logo := &models.LogoResp{}
 
 	err := r.DB.QueryRow(ctx, `
-	select * from logos 
+	select * from logos
 		where id = $1;`, id).Scan(&logo.ID, &logo.Url, &logo.Title)
 	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, repository.ErrLogoNotFound
@@ -98,7 +100,7 @@ func (r *Repository) GetLogo(ctx context.Context, id int) (*models.LogoResp, err
 
 func (r *Repository) GetLogos(ctx context.Context, limit, offset int) (map[int]*models.Logo, error) {
 	rows, err := r.DB.Query(ctx, `
-	select * 
+	select *
 		from logos
 	order by title asc
 	limit $1 offset $2`, limit, offset)

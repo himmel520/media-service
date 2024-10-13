@@ -6,6 +6,8 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/models"
 )
 
+// аналогично с прошлым микросом - можно заменить две команды ниже на одну - set
+// для того что бы сделать операцию идемпотентной
 func (s *Service) AddLogo(ctx context.Context, logo *models.Logo) (*models.LogoResp, error) {
 	return s.repo.AddLogo(ctx, logo)
 }

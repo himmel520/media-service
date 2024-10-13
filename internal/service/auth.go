@@ -9,6 +9,7 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/models"
 )
 
+// дубликат логики
 func (s *Service) GetUserRoleFromToken(jwtToken string, publicKey *rsa.PublicKey) (string, error) {
 	token, err := jwt.Parse(jwtToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {

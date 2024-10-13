@@ -2,6 +2,8 @@ package repository
 
 import "errors"
 
+// везде константы
+
 // DB
 var (
 	// foreign key violation: 23503
