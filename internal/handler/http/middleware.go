@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/models"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 )
 
 func (h *Handler) validateID() gin.HandlerFunc {
@@ -40,14 +40,14 @@ func (h *Handler) jwtAuthAccess(requiredRole string) gin.HandlerFunc {
 			return
 		}
 
-		userRole, err := h.srv.GetUserRoleFromToken(token, &h.cfg.PublicKey)
+		userRole, err := h.authSrv.GetUserRoleFromToken(token)
 		if err != nil {
 			h.log.Info(err.Error())
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{err.Error()})
 			return
 		}
 
-		if !h.srv.IsUserAuthorized(requiredRole, userRole) {
+		if !h.authSrv.IsUserAuthorized(requiredRole, userRole) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{"You don't have access to this resource"})
 			return
 		}
@@ -73,7 +73,7 @@ func (h *Handler) deleteCategoriesCache() gin.HandlerFunc {
 
 		go func() {
 			// удаление кэша в фоне
-			if err := h.srv.DeleteAdvsCache(context.Background()); err != nil {
+			if err := h.advSrv.DeleteCache(context.Background()); err != nil {
 				h.log.Error(err)
 			}
 		}()

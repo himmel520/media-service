@@ -1,6 +1,6 @@
 package models
 
-var (
+const (
     RoleAnonym = "anonym"
     RoleUser   = "user"
     RoleAdmin  = "admin"

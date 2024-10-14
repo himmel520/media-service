@@ -1,7 +1,7 @@
 package models
 
 type Logo struct {
-	ID    int    `json:"-"`
+	ID    int    `json:"id"`
 	Url   string `json:"url" binding:"required,min=3"`
 	Title string `json:"title" binding:"required,min=3,max=100"`
 }

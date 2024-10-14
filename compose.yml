@@ -8,7 +8,7 @@ services:
         - POSTGRES_USER=postgres
         - POSTGRES_DB=uo_media
     volumes:
-    - ./pg_media_data:/var/lib/postgresql/data
+    - pgdata:/var/lib/postgresql/data
     - ./migrations/20240926145319_mediaAd.up.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
     - "5432:5432"
@@ -42,3 +42,7 @@ services:
         condition: service_healthy
       rdb_media:
         condition: service_started
+
+volumes:
+  pgdata:  
+    driver: local

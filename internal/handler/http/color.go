@@ -7,8 +7,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
 )
 
 // @Summary Добавить новый цвет
@@ -28,7 +28,7 @@ func (h *Handler) addColor(c *gin.Context) {
 		return
 	}
 
-	newColor, err := h.srv.AddColor(c.Request.Context(), color)
+	newColor, err := h.colorSrv.Add(c.Request.Context(), color)
 	switch {
 	case errors.Is(err, repository.ErrColorHexExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -70,7 +70,7 @@ func (h *Handler) updateColor(c *gin.Context) {
 		return
 	}
 
-	newColor, err := h.srv.UpdateColor(c.Request.Context(), id, color)
+	newColor, err := h.colorSrv.Update(c.Request.Context(), id, color)
 	switch {
 	case errors.Is(err, repository.ErrColorHexExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -100,7 +100,7 @@ func (h *Handler) updateColor(c *gin.Context) {
 func (h *Handler) deleteColor(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.DeleteColor(c.Request.Context(), id)
+	err := h.colorSrv.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repository.ErrColorDependencyExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -134,7 +134,7 @@ func (h *Handler) getColors(c *gin.Context) {
 		return
 	}
 
-	colors, err := h.srv.GetColors(c.Request.Context(), query.Limit, query.Offset)
+	colors, err := h.colorSrv.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	switch {
 	case errors.Is(err, repository.ErrColorNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

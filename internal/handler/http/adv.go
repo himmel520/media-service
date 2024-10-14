@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
 )
 
 // @Summary Добавить новое объявление
@@ -28,7 +28,7 @@ func (h *Handler) addAdv(c *gin.Context) {
 		return
 	}
 
-	advResp, err := h.srv.AddAdv(c.Request.Context(), adv)
+	advResp, err := h.advSrv.Add(c.Request.Context(), adv)
 	switch {
 	case errors.Is(err, repository.ErrAdvDependencyNotExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -53,7 +53,7 @@ func (h *Handler) addAdv(c *gin.Context) {
 func (h *Handler) deleteAdv(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.DeleteAdv(c.Request.Context(), id)
+	err := h.advSrv.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repository.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -93,7 +93,7 @@ func (h *Handler) updateAdv(c *gin.Context) {
 		return
 	}
 
-	advResp, err := h.srv.UpdateAdv(c.Request.Context(), id, adv)
+	advResp, err := h.advSrv.Update(c.Request.Context(), id, adv)
 	switch {
 	case errors.Is(err, repository.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -130,7 +130,7 @@ func (h *Handler) getAdvsWithFilter(c *gin.Context) {
 		query.SetDefaultPriority()
 	}
 
-	advs, err := h.srv.GetAdvsWithFilter(c.Request.Context(), query.Limit, query.Offset, query.Post, query.Priority)
+	advs, err := h.advSrv.GetAllWithFilter(c.Request.Context(), query.Limit, query.Offset, query.Post, query.Priority)
 	switch {
 	case errors.Is(err, repository.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

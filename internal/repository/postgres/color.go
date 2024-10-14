@@ -6,13 +6,23 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func (r *Repository) AddColor(ctx context.Context, color *models.Color) (*models.ColorResp, error) {
+type ColorRepo struct {
+	DB *pgxpool.Pool
+}
+
+func NewColorRepo(db *pgxpool.Pool) *ColorRepo {
+	return &ColorRepo{DB: db}
+}
+
+func (r *ColorRepo) Add(ctx context.Context, color *models.Color) (*models.ColorResp, error) {
 	newColor := &models.ColorResp{}
 
 	err := r.DB.QueryRow(ctx, `
@@ -30,7 +40,7 @@ func (r *Repository) AddColor(ctx context.Context, color *models.Color) (*models
 	return newColor, err
 }
 
-func (r *Repository) UpdateColor(ctx context.Context, id int, color *models.ColorUpdate) (*models.ColorResp, error) {
+func (r *ColorRepo) Update(ctx context.Context, id int, color *models.ColorUpdate) (*models.ColorResp, error) {
 	var keys []string
 	var values []interface{}
 	if color.Title != nil {
@@ -65,7 +75,7 @@ func (r *Repository) UpdateColor(ctx context.Context, id int, color *models.Colo
 	return newColor, err
 }
 
-func (r *Repository) DeleteColor(ctx context.Context, id int) error {
+func (r *ColorRepo) Delete(ctx context.Context, id int) error {
 	cmdTag, err := r.DB.Exec(ctx, `
 	delete from Colors 
 		where id = $1`, id)
@@ -79,11 +89,10 @@ func (r *Repository) DeleteColor(ctx context.Context, id int) error {
 		return repository.ErrColorDependencyExist
 	}
 
-
 	return err
 }
 
-func (r *Repository) GetColors(ctx context.Context, limit, offset int) ([]*models.ColorResp, error) {
+func (r *ColorRepo) GetAllWithPagination(ctx context.Context, limit, offset int) ([]*models.ColorResp, error) {
 	rows, err := r.DB.Query(ctx, `
 	select * 
 		from colors
@@ -111,7 +120,7 @@ func (r *Repository) GetColors(ctx context.Context, limit, offset int) ([]*model
 	return colors, err
 }
 
-func (r *Repository) GetColorCount(ctx context.Context) (int, error) {
+func (r *ColorRepo) Count(ctx context.Context) (int, error) {
 	var count int
 	err := r.DB.QueryRow(ctx, `SELECT COUNT(*) FROM colors;`).Scan(&count)
 	return count, err

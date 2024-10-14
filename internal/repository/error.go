@@ -36,8 +36,3 @@ var (
 	ErrAdvDependencyNotExist = errors.New("cannot add or update adv because there is no record reference to color, logo or tg")
 	ErrAdvNotFound           = errors.New("adv not found")
 )
-
-// CACHE
-var (
-	ErrKeyNotFound = errors.New("there is no current data")
-)

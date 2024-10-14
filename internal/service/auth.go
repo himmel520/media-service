@@ -6,15 +6,25 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/himmel520/uoffer/mediaAd/models"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 )
 
-func (s *Service) GetUserRoleFromToken(jwtToken string, publicKey *rsa.PublicKey) (string, error) {
+//go:generate mockery --all
+
+type AuthService struct {
+	publicKey rsa.PublicKey
+}
+
+func NewAuthService(publicKey rsa.PublicKey) *AuthService {
+	return &AuthService{publicKey: publicKey}
+}
+
+func (s *AuthService) GetUserRoleFromToken(jwtToken string) (string, error) {
 	token, err := jwt.Parse(jwtToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
-		return publicKey, nil
+		return s.publicKey, nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("error parsing token: %v", err)
@@ -33,7 +43,7 @@ func (s *Service) GetUserRoleFromToken(jwtToken string, publicKey *rsa.PublicKey
 	return role, err
 }
 
-func (s *Service) IsUserAuthorized(requiredRole, userRole string) bool {
+func (s *AuthService) IsUserAuthorized(requiredRole, userRole string) bool {
 	rolesHierarchy := map[string]int{
 		models.RoleAnonym: 0,
 		models.RoleUser:   1,

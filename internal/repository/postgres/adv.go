@@ -6,22 +6,23 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// Adv interface {
-// 	// Переделать
-// 	// AddAdv(ctx context.Context, adv *models.Adv) (int, error)
-// 	// DeleteAdv(ctx context.Context, id int) error
-// 	// UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) error
-// 	// Получить все adv по должности
-// 	// получить все adv по priority и posts
-// }
+type AdvRepo struct {
+	DB *pgxpool.Pool
+}
 
-func (r *Repository) AddAdv(ctx context.Context, adv *models.Adv) (int, error) {
+func NewAdvRepo(db *pgxpool.Pool) *AdvRepo {
+	return &AdvRepo{DB: db}
+}
+
+func (r *AdvRepo) Add(ctx context.Context, adv *models.Adv) (int, error) {
 	var id int
 	err := r.DB.QueryRow(ctx, `
 	insert into adv
@@ -41,7 +42,7 @@ func (r *Repository) AddAdv(ctx context.Context, adv *models.Adv) (int, error) {
 	return id, err
 }
 
-func (r *Repository) GetAdvByID(ctx context.Context, id int) (*models.AdvResponse, error) {
+func (r *AdvRepo) GetByID(ctx context.Context, id int) (*models.AdvResponse, error) {
 	adv := &models.AdvResponse{}
 	err := r.DB.QueryRow(ctx, `
 	SELECT
@@ -68,7 +69,7 @@ func (r *Repository) GetAdvByID(ctx context.Context, id int) (*models.AdvRespons
 	return adv, err
 }
 
-func (r *Repository) DeleteAdv(ctx context.Context, id int) error {
+func (r *AdvRepo) Delete(ctx context.Context, id int) error {
 	cmdTag, err := r.DB.Exec(ctx, `delete from adv where id = $1`, id)
 	if cmdTag.RowsAffected() == 0 {
 		return repository.ErrAdvNotFound
@@ -77,7 +78,7 @@ func (r *Repository) DeleteAdv(ctx context.Context, id int) error {
 
 }
 
-func (r *Repository) UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) error {
+func (r *AdvRepo) Update(ctx context.Context, id int, adv *models.AdvUpdate) error {
 	var keys []string
 	var values []interface{}
 
@@ -137,7 +138,7 @@ func (r *Repository) UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdat
 	return err
 }
 
-func (r *Repository) GetAdvsWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error) {
+func (r *AdvRepo) GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error) {
 	query := `
 	SELECT
 		adv.id,
@@ -157,8 +158,8 @@ func (r *Repository) GetAdvsWithFilter(ctx context.Context, limit, offset int, p
 	LIMIT $1 OFFSET $2`
 
 	filter := fmt.Sprintf(`
-	WHERE adv.post in ('%v') AND adv.priority in (%v)`, 
-	strings.Join(posts, "', '"), strings.Join(priority, ", "))
+	WHERE adv.post in ('%v') AND adv.priority in (%v)`,
+		strings.Join(posts, "', '"), strings.Join(priority, ", "))
 
 	rows, err := r.DB.Query(ctx, fmt.Sprintf(query, filter), limit, offset)
 	if err != nil {

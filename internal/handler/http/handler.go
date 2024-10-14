@@ -2,75 +2,73 @@ package httphandler
 
 import (
 	"context"
-	"crypto/rsa"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/himmel520/uoffer/mediaAd/docs"
-	"github.com/himmel520/uoffer/mediaAd/internal/config"
-	"github.com/himmel520/uoffer/mediaAd/models"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/sirupsen/logrus"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-type (
-	Service interface {
-		Auth
-		Cache
-		Logo
+//go:generate mockery --all
 
-		Colors
-		Tg
-		Adv
+type (
+	AdvSrv interface {
+		Add(ctx context.Context, adv *models.Adv) (*models.AdvResponse, error)
+		Delete(ctx context.Context, id int) error
+		Update(ctx context.Context, id int, adv *models.AdvUpdate) (*models.AdvResponse, error)
+		GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error)
+		DeleteCache(ctx context.Context) error
 	}
 
-	Auth interface {
-		GetUserRoleFromToken(jwtToken string, publicKey *rsa.PublicKey) (string, error)
+	AuthSrv interface {
+		GetUserRoleFromToken(jwtToken string) (string, error)
 		IsUserAuthorized(requiredRole, userRole string) bool
 	}
 
-	Logo interface {
-		AddLogo(ctx context.Context, logo *models.Logo) (*models.LogoResp, error)
-		UpdateLogo(ctx context.Context, id int, logo *models.LogoUpdate) (*models.LogoResp, error)
-		DeleteLogo(ctx context.Context, id int) error
-		GetLogo(ctx context.Context, logoID int) (*models.LogoResp, error)
-		GetLogos(ctx context.Context, limit, offset int) (*models.LogosResp, error)
+	ColorSrv interface {
+		Add(ctx context.Context, color *models.Color) (*models.ColorResp, error)
+		Update(ctx context.Context, id int, color *models.ColorUpdate) (*models.ColorResp, error)
+		Delete(ctx context.Context, id int) error
+		GetAllWithPagination(ctx context.Context, limit, offset int) (*models.ColorsResp, error)
 	}
 
-	Colors interface {
-		AddColor(ctx context.Context, color *models.Color) (*models.ColorResp, error)
-		UpdateColor(ctx context.Context, id int, color *models.ColorUpdate) (*models.ColorResp, error)
-		DeleteColor(ctx context.Context, id int) error
-		GetColors(ctx context.Context, limit, offset int) (*models.ColorsResp, error)
+	LogoSrv interface {
+		Add(ctx context.Context, logo *models.Logo) (*models.LogoResp, error)
+		Update(ctx context.Context, id int, logo *models.LogoUpdate) (*models.LogoResp, error)
+		Delete(ctx context.Context, id int) error
+		GetByID(ctx context.Context, id int) (*models.LogoResp, error)
+		GetAll(ctx context.Context) ([]*models.Logo, error)
+		GetAllWithPagination(ctx context.Context, limit, offset int) (*models.LogosResp, error)
 	}
 
-	Tg interface {
-		AddTG(ctx context.Context, tg *models.TG) (*models.TGResp, error)
-		UpdateTG(ctx context.Context, id int, TG *models.TGUpdate) (*models.TGResp, error)
-		DeleteTG(ctx context.Context, id int) error
-		GetTGs(ctx context.Context, limit, offset int) (*models.TGsResp, error)
-	}
-
-	Adv interface {
-		AddAdv(ctx context.Context, adv *models.Adv) (*models.AdvResponse, error)
-		DeleteAdv(ctx context.Context, id int) error
-		UpdateAdv(ctx context.Context, id int, adv *models.AdvUpdate) (*models.AdvResponse, error)
-		GetAdvsWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*models.AdvResponse, error)
-	}
-
-	Cache interface {
-		DeleteAdvsCache(ctx context.Context) error
+	TGSrv interface {
+		Add(ctx context.Context, tg *models.TG) (*models.TGResp, error)
+		Update(ctx context.Context, id int, TG *models.TGUpdate) (*models.TGResp, error)
+		Delete(ctx context.Context, id int) error
+		GetAllWithPagination(ctx context.Context, limit, offset int) (*models.TGsResp, error)
 	}
 )
 
 type Handler struct {
-	srv Service
-	log *logrus.Logger
-	cfg *config.JWT
+	advSrv   AdvSrv
+	authSrv  AuthSrv
+	colorSrv ColorSrv
+	logoSrv  LogoSrv
+	tgSrv    TGSrv
+	log      *logrus.Logger
 }
 
-func New(srv Service, cfg *config.JWT, log *logrus.Logger) *Handler {
-	return &Handler{srv: srv, log: log, cfg: cfg}
+func New(advSrv AdvSrv, authSrv AuthSrv, colorSrv ColorSrv, logoSrv LogoSrv, tgSrv TGSrv, log *logrus.Logger) *Handler {
+	return &Handler{
+		advSrv:   advSrv,
+		authSrv:  authSrv,
+		colorSrv: colorSrv,
+		logoSrv:  logoSrv,
+		tgSrv:    tgSrv,
+		log:      log,
+	}
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
@@ -98,7 +96,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			logo := admin.Group("/logos")
 			{
-				logo.POST("/", h.addLogo) // Add a new logo
+				logo.GET("/", h.getPaginatedLogos) // get logos
+				logo.POST("/", h.addLogo)          // Add a new logo
 
 				logo.Use(h.validateID())
 				logo.PUT("/:id", h.updateLogo)    // Update a logo

@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 )
 
 // @Summary Добавить новый логотип
@@ -28,7 +28,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 		return
 	}
 
-	newLogo, err := h.srv.AddLogo(c.Request.Context(), logo)
+	newLogo, err := h.logoSrv.Add(c.Request.Context(), logo)
 	if err != nil {
 		if errors.Is(err, repository.ErrLogoExist) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -69,7 +69,7 @@ func (h *Handler) updateLogo(c *gin.Context) {
 		return
 	}
 
-	newLogo, err := h.srv.UpdateLogo(c.Request.Context(), id, logo)
+	newLogo, err := h.logoSrv.Update(c.Request.Context(), id, logo)
 	switch {
 	case errors.Is(err, repository.ErrLogoExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -99,7 +99,7 @@ func (h *Handler) updateLogo(c *gin.Context) {
 func (h *Handler) deleteLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.DeleteLogo(c.Request.Context(), id)
+	err := h.logoSrv.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repository.ErrLogoDependency):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -126,14 +126,29 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 // @Failure 404 {object} errorResponse "Логотипы не найдены"
 // @Failure 500 {object} errorResponse "Внутренняя ошибка сервера"
 // @Router /logos [get]
-func (h *Handler) getLogos(c *gin.Context) {
+func (h *Handler) getPaginatedLogos(c *gin.Context) {
 	var query *PaginationQuery
 	if err := c.BindQuery(&query); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{fmt.Sprintf("неккоректный query: %v", err)})
 		return
 	}
 
-	logos, err := h.srv.GetLogos(c.Request.Context(), query.Limit, query.Offset)
+	logos, err := h.logoSrv.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
+	switch {
+	case errors.Is(err, repository.ErrLogoNotFound):
+		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
+		return
+	case err != nil:
+		h.log.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, logos)
+}
+
+func (h *Handler) getLogos(c *gin.Context) {
+	logos, err := h.logoSrv.GetAll(c.Request.Context())
 	switch {
 	case errors.Is(err, repository.ErrLogoNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -158,9 +173,8 @@ func (h *Handler) getLogos(c *gin.Context) {
 // @Router /logos/{id} [get]
 func (h *Handler) getLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
-	
 
-	logo, err := h.srv.GetLogo(c.Request.Context(), id)
+	logo, err := h.logoSrv.GetByID(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repository.ErrLogoNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

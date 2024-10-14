@@ -8,10 +8,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/config"
+	"github.com/himmel520/uoffer/mediaAd/config"
+	"github.com/himmel520/uoffer/mediaAd/internal/cache/redis"
 	httphandler "github.com/himmel520/uoffer/mediaAd/internal/handler/http"
+
 	"github.com/himmel520/uoffer/mediaAd/internal/repository/postgres"
-	"github.com/himmel520/uoffer/mediaAd/internal/repository/redis"
 	"github.com/himmel520/uoffer/mediaAd/internal/server"
 	"github.com/himmel520/uoffer/mediaAd/internal/service"
 )
@@ -34,18 +35,31 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to connect to pool: %v", err)
 	}
+	defer db.Close()
 
-	cache, err := redis.New(&cfg.Cache)
+	rdb, err := redis.New(cfg.Cache.Conn)
 	if err != nil {
-		log.Fatalf("unable to connect to redis: %v", err)
+		log.Fatalf("unable to connect to cache: %v", err)
 	}
+	defer rdb.Close()
 
-	repo := postgres.NewRepo(db)
-	srv := service.New(repo, cache, log)
-	handler := httphandler.New(srv, &cfg.Srv.JWT, log)
+	advCache := redis.NewAdvCache(rdb, cfg.Cache.Exp)
+
+	advRepo := postgres.NewAdvRepo(db)
+	colorRepo := postgres.NewColorRepo(db)
+	logoRepo := postgres.NewLogorRepo(db)
+	tgRepo := postgres.NewTGRepo(db)
+
+	handler := httphandler.New(
+		service.NewAdvService(advRepo, advCache, log),
+		service.NewAuthService(cfg.Srv.JWT.PublicKey),
+		service.NewColorService(colorRepo, log),
+		service.NewLogoService(logoRepo, log),
+		service.NewTGService(tgRepo, log),
+		log,
+	)
 
 	// сервер
-
 	app := server.New(handler.InitRoutes(), cfg.Srv.Addr)
 	go func() {
 		log.Infof("the server is starting on %v", cfg.Srv.Addr)

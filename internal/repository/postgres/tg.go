@@ -6,20 +6,23 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// TG interface {
-// 	// Добавить
-// 	// Изменить
-// 	// Получить с post разделением
-// 	// Удалить
-// }
+type TGRepo struct {
+	DB *pgxpool.Pool
+}
 
-func (r *Repository) AddTG(ctx context.Context, tg *models.TG) (*models.TGResp, error) {
+func NewTGRepo(db *pgxpool.Pool) *TGRepo {
+	return &TGRepo{DB: db}
+}
+
+func (r *TGRepo) Add(ctx context.Context, tg *models.TG) (*models.TGResp, error) {
 	newTG := &models.TGResp{}
 
 	err := r.DB.QueryRow(ctx, `
@@ -37,7 +40,7 @@ func (r *Repository) AddTG(ctx context.Context, tg *models.TG) (*models.TGResp, 
 	return newTG, err
 }
 
-func (r *Repository) UpdateTG(ctx context.Context, id int, tg *models.TGUpdate) (*models.TGResp, error) {
+func (r *TGRepo) Update(ctx context.Context, id int, tg *models.TGUpdate) (*models.TGResp, error) {
 	var keys []string
 	var values []interface{}
 	if tg.Url != nil {
@@ -71,7 +74,7 @@ func (r *Repository) UpdateTG(ctx context.Context, id int, tg *models.TGUpdate) 
 	return newTG, err
 }
 
-func (r *Repository) DeleteTG(ctx context.Context, id int) error {
+func (r *TGRepo) Delete(ctx context.Context, id int) error {
 	var pgErr *pgconn.PgError
 
 	cmdTag, err := r.DB.Exec(ctx, `
@@ -90,7 +93,7 @@ func (r *Repository) DeleteTG(ctx context.Context, id int) error {
 	return err
 }
 
-func (r *Repository) GetTGs(ctx context.Context, limit, offset int) ([]*models.TGResp, error) {
+func (r *TGRepo) GetAllWithPagination(ctx context.Context, limit, offset int) ([]*models.TGResp, error) {
 	rows, err := r.DB.Query(ctx, `
 	select * 
 		from tg
@@ -118,7 +121,7 @@ func (r *Repository) GetTGs(ctx context.Context, limit, offset int) ([]*models.T
 	return tgs, err
 }
 
-func (r *Repository) GetTGCount(ctx context.Context) (int, error) {
+func (r *TGRepo) Count(ctx context.Context) (int, error) {
 	var count int
 	err := r.DB.QueryRow(ctx, `SELECT COUNT(*) FROM tg;`).Scan(&count)
 	return count, err

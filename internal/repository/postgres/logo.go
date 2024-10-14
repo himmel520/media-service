@@ -6,13 +6,23 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func (r *Repository) AddLogo(ctx context.Context, logo *models.Logo) (*models.LogoResp, error) {
+type LogoRepo struct {
+	DB *pgxpool.Pool
+}
+
+func NewLogorRepo(db *pgxpool.Pool) *LogoRepo {
+	return &LogoRepo{DB: db}
+}
+
+func (r *LogoRepo) Add(ctx context.Context, logo *models.Logo) (*models.LogoResp, error) {
 	newLogo := &models.LogoResp{}
 
 	err := r.DB.QueryRow(ctx, `
@@ -30,7 +40,7 @@ func (r *Repository) AddLogo(ctx context.Context, logo *models.Logo) (*models.Lo
 	return newLogo, err
 }
 
-func (r *Repository) UpdateLogo(ctx context.Context, id int, logo *models.LogoUpdate) (*models.LogoResp, error) {
+func (r *LogoRepo) Update(ctx context.Context, id int, logo *models.LogoUpdate) (*models.LogoResp, error) {
 	var keys []string
 	var values []interface{}
 	if logo.Url != nil {
@@ -64,7 +74,7 @@ func (r *Repository) UpdateLogo(ctx context.Context, id int, logo *models.LogoUp
 	return newLogo, err
 }
 
-func (r *Repository) DeleteLogo(ctx context.Context, id int) error {
+func (r *LogoRepo) Delete(ctx context.Context, id int) error {
 	var pgErr *pgconn.PgError
 
 	cmdTag, err := r.DB.Exec(ctx, `
@@ -83,7 +93,7 @@ func (r *Repository) DeleteLogo(ctx context.Context, id int) error {
 	return err
 }
 
-func (r *Repository) GetLogo(ctx context.Context, id int) (*models.LogoResp, error) {
+func (r *LogoRepo) GetByID(ctx context.Context, id int) (*models.LogoResp, error) {
 	logo := &models.LogoResp{}
 
 	err := r.DB.QueryRow(ctx, `
@@ -96,7 +106,34 @@ func (r *Repository) GetLogo(ctx context.Context, id int) (*models.LogoResp, err
 	return logo, err
 }
 
-func (r *Repository) GetLogos(ctx context.Context, limit, offset int) (map[int]*models.Logo, error) {
+func (r *LogoRepo) GetAll(ctx context.Context) ([]*models.Logo, error) {
+	rows, err := r.DB.Query(ctx, `
+	select * 
+		from logos
+	order by title asc`)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	logos := []*models.Logo{}
+	for rows.Next() {
+		logo := &models.Logo{}
+		if err := rows.Scan(&logo.ID, &logo.Url, &logo.Title); err != nil {
+			return nil, err
+		}
+
+		logos = append(logos, logo)
+	}
+
+	if len(logos) == 0 {
+		return nil, repository.ErrLogoNotFound
+	}
+
+	return logos, err
+}
+
+func (r *LogoRepo) GetAllWithPagination(ctx context.Context, limit, offset int) (map[int]*models.Logo, error) {
 	rows, err := r.DB.Query(ctx, `
 	select * 
 		from logos
@@ -124,7 +161,7 @@ func (r *Repository) GetLogos(ctx context.Context, limit, offset int) (map[int]*
 	return logos, err
 }
 
-func (r *Repository) GetLogoCount(ctx context.Context) (int, error) {
+func (r *LogoRepo) Count(ctx context.Context) (int, error) {
 	var count int
 	err := r.DB.QueryRow(ctx, `SELECT COUNT(*) FROM logos;`).Scan(&count)
 	return count, err

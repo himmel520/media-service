@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/repository"
-	"github.com/himmel520/uoffer/mediaAd/models"
+	"github.com/himmel520/uoffer/mediaAd/internal/models"
 )
 
 // @Summary Добавить группу Telegram
@@ -28,7 +28,7 @@ func (h *Handler) addTG(c *gin.Context) {
 		return
 	}
 
-	newTG, err := h.srv.AddTG(c.Request.Context(), tg)
+	newTG, err := h.tgSrv.Add(c.Request.Context(), tg)
 	if err != nil {
 		if errors.Is(err, repository.ErrTGExist) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -60,7 +60,7 @@ func (h *Handler) getTGs(c *gin.Context) {
 		return
 	}
 
-	tgs, err := h.srv.GetTGs(c.Request.Context(), query.Limit, query.Offset)
+	tgs, err := h.tgSrv.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	switch {
 	case errors.Is(err, repository.ErrTGNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -100,7 +100,7 @@ func (h *Handler) updateTG(c *gin.Context) {
 		return
 	}
 
-	newTG, err := h.srv.UpdateTG(c.Request.Context(), id, tg)
+	newTG, err := h.tgSrv.Update(c.Request.Context(), id, tg)
 	switch {
 	case errors.Is(err, repository.ErrTGExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -130,7 +130,7 @@ func (h *Handler) updateTG(c *gin.Context) {
 func (h *Handler) deleteTG(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.DeleteTG(c.Request.Context(), id)
+	err := h.tgSrv.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repository.ErrTGDependencyExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
