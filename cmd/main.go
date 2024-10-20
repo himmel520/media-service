@@ -9,12 +9,14 @@ import (
 	"syscall"
 
 	"github.com/himmel520/uoffer/mediaAd/config"
-	"github.com/himmel520/uoffer/mediaAd/internal/cache/redis"
-	httphandler "github.com/himmel520/uoffer/mediaAd/internal/handler/http"
+	httpctrl "github.com/himmel520/uoffer/mediaAd/internal/controller/http"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/repository/postgres"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/postgres"
 	"github.com/himmel520/uoffer/mediaAd/internal/server"
-	"github.com/himmel520/uoffer/mediaAd/internal/service"
+	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 )
 
 // @title API Documentation
@@ -43,21 +45,11 @@ func main() {
 	}
 	defer rdb.Close()
 
-	advCache := redis.NewAdvCache(rdb, cfg.Cache.Exp)
+	cache := cache.New(rdb, cfg.Cache.Exp)
+	repo := repository.New(db)
+	usecase := usecase.New(repo, cache, cfg.Srv.JWT.PublicKey, log)
 
-	advRepo := postgres.NewAdvRepo(db)
-	colorRepo := postgres.NewColorRepo(db)
-	logoRepo := postgres.NewLogorRepo(db)
-	tgRepo := postgres.NewTGRepo(db)
-
-	handler := httphandler.New(
-		service.NewAdvService(advRepo, advCache, log),
-		service.NewAuthService(cfg.Srv.JWT.PublicKey),
-		service.NewColorService(colorRepo, log),
-		service.NewLogoService(logoRepo, log),
-		service.NewTGService(tgRepo, log),
-		log,
-	)
+	handler := httpctrl.New(usecase, log)
 
 	// сервер
 	app := server.New(handler.InitRoutes(), cfg.Srv.Addr)
