@@ -16,14 +16,14 @@ import (
 
 type (
 	Usecase struct {
-		Adv   AdvSrv
-		Auth  AuthSrv
-		Color ColorSrv
-		Logo  LogoSrv
-		TG    TGSrv
+		Adv   AdvUC
+		Auth  AuthUC
+		Color ColorUC
+		Logo  LogoUC
+		TG    TGUC
 	}
 
-	AdvSrv interface {
+	AdvUC interface {
 		Add(ctx context.Context, adv *entity.Adv) (*entity.AdvResponse, error)
 		Delete(ctx context.Context, id int) error
 		Update(ctx context.Context, id int, adv *entity.AdvUpdate) (*entity.AdvResponse, error)
@@ -31,19 +31,19 @@ type (
 		DeleteCache(ctx context.Context) error
 	}
 
-	AuthSrv interface {
+	AuthUC interface {
 		GetUserRoleFromToken(jwtToken string) (string, error)
 		IsUserAuthorized(requiredRole, userRole string) bool
 	}
 
-	ColorSrv interface {
+	ColorUC interface {
 		Add(ctx context.Context, color *entity.Color) (*entity.ColorResp, error)
 		Update(ctx context.Context, id int, color *entity.ColorUpdate) (*entity.ColorResp, error)
 		Delete(ctx context.Context, id int) error
 		GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.ColorsResp, error)
 	}
 
-	LogoSrv interface {
+	LogoUC interface {
 		Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error)
 		Update(ctx context.Context, id int, logo *entity.LogoUpdate) (*entity.LogoResp, error)
 		Delete(ctx context.Context, id int) error
@@ -52,7 +52,7 @@ type (
 		GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.LogosResp, error)
 	}
 
-	TGSrv interface {
+	TGUC interface {
 		Add(ctx context.Context, tg *entity.TG) (*entity.TGResp, error)
 		Update(ctx context.Context, id int, TG *entity.TGUpdate) (*entity.TGResp, error)
 		Delete(ctx context.Context, id int) error
