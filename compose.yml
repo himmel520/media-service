@@ -4,14 +4,14 @@ services:
     container_name: pg_media
     image: postgres:alpine
     environment:
-        - POSTGRES_PASSWORD=postgres
-        - POSTGRES_USER=postgres
-        - POSTGRES_DB=uo_media
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=uo_media
     volumes:
-    - pgdata:/var/lib/postgresql/data
-    - ./migrations/20240926145319_mediaAd.up.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+      - ./migrations/20240926145319_mediaAd.up.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-    - "5432:5432"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d uo_media"]
       interval: 10s
@@ -23,7 +23,7 @@ services:
     image: redis:latest
     container_name: rdb_media
     environment:
-      REDIS_PASSWORD: redis  
+      REDIS_PASSWORD: redis
     ports:
       - "6379:6379"
 
@@ -44,5 +44,5 @@ services:
         condition: service_started
 
 volumes:
-  pgdata:  
+  pgdata:
     driver: local
