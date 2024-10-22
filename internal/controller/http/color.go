@@ -28,7 +28,7 @@ func (h *Handler) addColor(c *gin.Context) {
 		return
 	}
 
-	newColor, err := h.srv.Color.Add(c.Request.Context(), color)
+	newColor, err := h.uc.Color.Add(c.Request.Context(), color)
 	switch {
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -70,7 +70,7 @@ func (h *Handler) updateColor(c *gin.Context) {
 		return
 	}
 
-	newColor, err := h.srv.Color.Update(c.Request.Context(), id, color)
+	newColor, err := h.uc.Color.Update(c.Request.Context(), id, color)
 	switch {
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -100,7 +100,7 @@ func (h *Handler) updateColor(c *gin.Context) {
 func (h *Handler) deleteColor(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.Color.Delete(c.Request.Context(), id)
+	err := h.uc.Color.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repoerr.ErrColorDependencyExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -134,7 +134,7 @@ func (h *Handler) getColors(c *gin.Context) {
 		return
 	}
 
-	colors, err := h.srv.Color.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
+	colors, err := h.uc.Color.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	switch {
 	case errors.Is(err, repoerr.ErrColorNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

@@ -7,30 +7,29 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 )
 
 func (h *Handler) validateID() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if _, err := strconv.Atoi(c.Param("id")); err != nil {
+		id, err := strconv.Atoi(c.Param("id"))
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{"invalid id"})
+			return
+		}
+
+		if id <= 0 {
 			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{"invalid id"})
 			return
 		}
 	}
 }
 
-// anonym - доступ с ограничением user интерфейса
-// user - полный доступ к user интерфейсу
-// admin - доступ ко всему сайту
-func (h *Handler) jwtAuthAccess(requiredRole string) gin.HandlerFunc {
+
+func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			if requiredRole == "admin" {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{"Authorization header is missing"})
-				return
-			}
-			c.Set("role", entity.RoleAnonym)
+			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{"Authorization header is missing"})
 			return
 		}
 
@@ -40,19 +39,17 @@ func (h *Handler) jwtAuthAccess(requiredRole string) gin.HandlerFunc {
 			return
 		}
 
-		userRole, err := h.srv.Auth.GetUserRoleFromToken(token)
+		userRole, err := h.uc.Auth.GetUserRoleFromToken(token)
 		if err != nil {
 			h.log.Info(err.Error())
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{err.Error()})
 			return
 		}
 
-		if !h.srv.Auth.IsUserAuthorized(requiredRole, userRole) {
+		if !h.uc.Auth.IsUserAdmin(userRole) {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{"You don't have access to this resource"})
 			return
 		}
-
-		c.Set("role", userRole)
 	}
 }
 
@@ -73,7 +70,7 @@ func (h *Handler) deleteCategoriesCache() gin.HandlerFunc {
 
 		go func() {
 			// удаление кэша в фоне
-			if err := h.srv.Adv.DeleteCache(context.Background()); err != nil {
+			if err := h.uc.Adv.DeleteCache(context.Background()); err != nil {
 				h.log.Error(err)
 			}
 		}()

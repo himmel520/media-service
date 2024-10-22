@@ -41,12 +41,6 @@ func (s *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
 	return role, err
 }
 
-func (s *AuthUsecase) IsUserAuthorized(requiredRole, userRole string) bool {
-	rolesHierarchy := map[string]int{
-		entity.RoleAnonym: 0,
-		entity.RoleUser:   1,
-		entity.RoleAdmin:  2,
-	}
-
-	return rolesHierarchy[userRole] >= rolesHierarchy[requiredRole]
+func (s *AuthUsecase) IsUserAdmin(userRole string) bool {
+	return userRole == entity.RoleAdmin
 }

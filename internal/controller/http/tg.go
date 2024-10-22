@@ -28,7 +28,7 @@ func (h *Handler) addTG(c *gin.Context) {
 		return
 	}
 
-	newTG, err := h.srv.TG.Add(c.Request.Context(), tg)
+	newTG, err := h.uc.TG.Add(c.Request.Context(), tg)
 	if err != nil {
 		if errors.Is(err, repoerr.ErrTGExist) {
 			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -60,7 +60,7 @@ func (h *Handler) getTGs(c *gin.Context) {
 		return
 	}
 
-	tgs, err := h.srv.TG.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
+	tgs, err := h.uc.TG.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	switch {
 	case errors.Is(err, repoerr.ErrTGNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -100,7 +100,7 @@ func (h *Handler) updateTG(c *gin.Context) {
 		return
 	}
 
-	newTG, err := h.srv.TG.Update(c.Request.Context(), id, tg)
+	newTG, err := h.uc.TG.Update(c.Request.Context(), id, tg)
 	switch {
 	case errors.Is(err, repoerr.ErrTGExist):
 		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
@@ -130,7 +130,7 @@ func (h *Handler) updateTG(c *gin.Context) {
 func (h *Handler) deleteTG(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.TG.Delete(c.Request.Context(), id)
+	err := h.uc.TG.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repoerr.ErrTGDependencyExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})

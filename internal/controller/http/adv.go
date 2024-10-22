@@ -28,7 +28,7 @@ func (h *Handler) addAdv(c *gin.Context) {
 		return
 	}
 
-	advResp, err := h.srv.Adv.Add(c.Request.Context(), adv)
+	advResp, err := h.uc.Adv.Add(c.Request.Context(), adv)
 	switch {
 	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
 		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
@@ -53,7 +53,7 @@ func (h *Handler) addAdv(c *gin.Context) {
 func (h *Handler) deleteAdv(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
-	err := h.srv.Adv.Delete(c.Request.Context(), id)
+	err := h.uc.Adv.Delete(c.Request.Context(), id)
 	switch {
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -93,7 +93,7 @@ func (h *Handler) updateAdv(c *gin.Context) {
 		return
 	}
 
-	advResp, err := h.srv.Adv.Update(c.Request.Context(), id, adv)
+	advResp, err := h.uc.Adv.Update(c.Request.Context(), id, adv)
 	switch {
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
@@ -130,7 +130,7 @@ func (h *Handler) getAdvsWithFilter(c *gin.Context) {
 		query.SetDefaultPriority()
 	}
 
-	advs, err := h.srv.Adv.GetAllWithFilter(c.Request.Context(), query.Limit, query.Offset, query.Post, query.Priority)
+	advs, err := h.uc.Adv.GetAllWithFilter(c.Request.Context(), query.Limit, query.Offset, query.Post, query.Priority)
 	switch {
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})

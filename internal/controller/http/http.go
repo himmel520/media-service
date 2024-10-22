@@ -3,7 +3,6 @@ package httpctrl
 import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/himmel520/uoffer/mediaAd/docs"
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 
 	"github.com/sirupsen/logrus"
@@ -12,13 +11,13 @@ import (
 )
 
 type Handler struct {
-	srv *usecase.Usecase
+	uc  *usecase.Usecase
 	log *logrus.Logger
 }
 
-func New(srv *usecase.Usecase, log *logrus.Logger) *Handler {
+func New(uc *usecase.Usecase, log *logrus.Logger) *Handler {
 	return &Handler{
-		srv: srv,
+		uc:  uc,
 		log: log,
 	}
 }
@@ -43,8 +42,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			adv.GET("/", h.getAdvsWithFilter)
 		}
+		
 		// admin
-		admin := api.Group("/admin", h.jwtAuthAccess(entity.RoleAdmin))
+		admin := api.Group("/admin", h.jwtAdminAccess())
 		{
 			logo := admin.Group("/logos")
 			{
