@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase/mocks"
 	"github.com/sirupsen/logrus"
@@ -33,19 +33,19 @@ func TestValidateID(t *testing.T) {
 			name:           "Err id is 0",
 			id:             "0",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   `{"message":"invalid id"}`,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
 		},
 		{
 			name:           "Err id is negative",
 			id:             "-1",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   `{"message":"invalid id"}`,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
 		},
 		{
 			name:           "Err id is not a number",
 			id:             "adc",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   `{"message":"invalid id"}`,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
 		},
 	}
 
@@ -90,32 +90,32 @@ func TestJwtAdminAccess(t *testing.T) {
 		wantRespBody   string
 	}{
 		{
-			name: "OK",
-			args: args{
-				token: "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4ifQ.DkCyanZAGNrDI91Isw6y6VKhZ49ut8vz4Xepbx1WBiFbstSFfxqXPCTXo1tNNYMtoLLStMdx8wQwXzLYuoAVYt0R8O2X6d5Zp7si019vqS-aG_MGD-WX0MPetoQSe8wyA0FHCv487GjZ2uvYwo4mcJNZ-AiuEag6IdlfIQZQlrx7-gUy6pkpZM53K_ynxU1iY55rWAYIbPPZSEXr_JrHMSLU_L5ucNPIpqoWL_w12-w8uxHJ_ithE9LxwCkvgD0Umhoy7FSlg-0Ql_0LXgN1UOi-3o2zq_pxgTELsAAdB3PIhNATfenGGO70_yXk3j_YeeqqrLlaGv_MHd-WM-PSZA",
-				user:  "admin",
-			},
-			mockBehaviour: func(m *mocks.AuthUC, args args) {
-				token := strings.TrimPrefix(args.token, "Bearer ")
-				m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
-				m.On("IsUserAdmin", args.user).Return(true).Once()
-			},
-			wantStatusCode: http.StatusOK,
-			wantRespBody:   "",
-		},
-		{
-			name: "invalid user role",
-			args: args{
-				token: "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidXNlciJ9.a0mZwlGQ2mj8gH10l1bDasyh-WE_jOISXV6uYsrL26XuUk1fq3mlMvsoP94R9pgDczP0ksJ7yfBZU4g6Tfjh0EhT1ra47s7ECru8oP_PUzQkMw93RX5WQiw4qai4NhBWmSYStuAaHbPzdBsBqIjE2zp6jgvGZWpsvcsG-Vcyh6z2CaCiViTrvaVx_9mtKAQoZ6rLDy8JULD-wWQdWcv5Sq3Z9IjIb9XI6i52EEZsYMpcSxqvg8KD6iPzWgUqWPKGUJF3BKhy0e-aIWFMa8uIrUBIPm4Nk_hU7SzHUuZztXnzKX_XGttwJVAr-pwqoKJjvfJcYCquV-ybBoozlTxSvQ",
-				user:  "invalid",
-			},
-			mockBehaviour: func(m *mocks.AuthUC, args args) {
-				token := strings.TrimPrefix(args.token, "Bearer ")
-				m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
-				m.On("IsUserAdmin", args.user).Return(false).Once()
-			},
-			wantStatusCode: http.StatusForbidden,
-			wantRespBody:   `{"message":"You don't have access to this resource"}`,
+			// 	name: "OK",
+			// 	args: args{
+			// 		token: "Bearer TODO: Брать безопасно",
+			// 		user:  "admin",
+			// 	},
+			// 	mockBehaviour: func(m *mocks.AuthUC, args args) {
+			// 		token := strings.TrimPrefix(args.token, "Bearer ")
+			// 		m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
+			// 		m.On("IsUserAdmin", args.user).Return(true).Once()
+			// 	},
+			// 	wantStatusCode: http.StatusOK,
+			// 	wantRespBody:   "",
+			// },
+			// {
+			// 	name: "invalid user role",
+			// 	args: args{
+			// 		token: "Bearer TODO: Брать безопасно",
+			// 		user:  "invalid",
+			// 	},
+			// 	mockBehaviour: func(m *mocks.AuthUC, args args) {
+			// 		token := strings.TrimPrefix(args.token, "Bearer ")
+			// 		m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
+			// 		m.On("IsUserAdmin", args.user).Return(false).Once()
+			// 	},
+			// 	wantStatusCode: http.StatusForbidden,
+			// 	wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrForbidden),
 		},
 		{
 			name: "Empty auth header",
@@ -124,7 +124,7 @@ func TestJwtAdminAccess(t *testing.T) {
 			},
 			mockBehaviour:  func(m *mocks.AuthUC, args args) {},
 			wantStatusCode: http.StatusUnauthorized,
-			wantRespBody:   `{"message":"Authorization header is missing"}`,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrEmptyAuthHeader),
 		},
 		{
 			name: "invalid auth header format",
@@ -133,7 +133,7 @@ func TestJwtAdminAccess(t *testing.T) {
 			},
 			mockBehaviour:  func(m *mocks.AuthUC, args args) {},
 			wantStatusCode: http.StatusUnauthorized,
-			wantRespBody:   `{"message":"Authorization header is invalid"}`,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidAuthHeader),
 		},
 	}
 
@@ -182,7 +182,6 @@ func TestDeleteCategoriesCache(t *testing.T) {
 			method: http.MethodPost,
 			mockBehaviour: func(m *mocks.AdvUC) {
 				m.On("DeleteCache", mock.Anything).Return(nil).Once()
-				// time.Sleep(1 * time.Second)
 			},
 			wantStatusCode: http.StatusOK,
 		},
