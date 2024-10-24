@@ -1,8 +1,6 @@
 package httpctrl
 
 import (
-	"sync"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/himmel520/uoffer/mediaAd/docs"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
@@ -27,7 +25,6 @@ func New(uc *usecase.Usecase, log *logrus.Logger) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
 
-	var wg sync.WaitGroup
 	api := r.Group("/api/v1")
 	{
 		// Swagger
@@ -59,7 +56,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				logo.DELETE("/:id", h.deleteLogo) // Delete a logo
 			}
 
-			colors := admin.Group("/colors", h.deleteCategoriesCache(&wg))
+			colors := admin.Group("/colors", h.deleteCategoriesCache())
 			{
 				colors.POST("/", h.addColor)
 				colors.GET("/", h.getColors)
@@ -69,7 +66,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				colors.PUT("/:id", h.updateColor)
 			}
 
-			tg := admin.Group("/tgs", h.deleteCategoriesCache(&wg))
+			tg := admin.Group("/tgs", h.deleteCategoriesCache())
 			{
 				tg.POST("/", h.addTG)
 				tg.GET("/", h.getTGs)
@@ -79,7 +76,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				tg.PUT("/:id", h.updateTG)
 			}
 
-			adv := admin.Group("/ads", h.deleteCategoriesCache(&wg))
+			adv := admin.Group("/ads", h.deleteCategoriesCache())
 			{
 				adv.POST("/", h.addAdv)
 

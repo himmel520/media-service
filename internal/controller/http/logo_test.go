@@ -77,7 +77,10 @@ func TestGetLogo(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockLogoUsecase := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoUsecase}, logrus.New()}
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
 			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
@@ -150,7 +153,10 @@ func TestGetLogos(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockLogoUsecase := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoUsecase}, logrus.New()}
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
 			tc.mockBehaviour(mockLogoUsecase)
 
@@ -292,7 +298,10 @@ func TestAddLogo(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockLogoUsecase := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoUsecase}, logrus.New()}
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
 			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
@@ -470,7 +479,10 @@ func TestUpdateLogo(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockLogoUsecase := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoUsecase}, logrus.New()}
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
 			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
