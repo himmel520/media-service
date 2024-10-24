@@ -9,6 +9,8 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 )
 
+//go:generate mockery --all
+
 type (
 	Cache struct {
 		Adv AdvCache

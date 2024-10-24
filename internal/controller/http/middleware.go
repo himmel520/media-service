@@ -47,7 +47,7 @@ func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 		}
 
 		if !h.uc.Auth.IsUserAdmin(userRole) {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{"You don't have access to this resource"})
+			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse{"You don't have access to this resource"})
 			return
 		}
 	}
