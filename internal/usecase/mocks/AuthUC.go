@@ -37,17 +37,17 @@ func (_m *AuthUC) GetUserRoleFromToken(jwtToken string) (string, error) {
 	return r0, r1
 }
 
-// IsUserAuthorized provides a mock function with given fields: requiredRole, userRole
-func (_m *AuthUC) IsUserAuthorized(requiredRole string, userRole string) bool {
-	ret := _m.Called(requiredRole, userRole)
+// IsUserAdmin provides a mock function with given fields: userRole
+func (_m *AuthUC) IsUserAdmin(userRole string) bool {
+	ret := _m.Called(userRole)
 
 	if len(ret) == 0 {
-		panic("no return value specified for IsUserAuthorized")
+		panic("no return value specified for IsUserAdmin")
 	}
 
 	var r0 bool
-	if rf, ok := ret.Get(0).(func(string, string) bool); ok {
-		r0 = rf(requiredRole, userRole)
+	if rf, ok := ret.Get(0).(func(string) bool); ok {
+		r0 = rf(userRole)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}

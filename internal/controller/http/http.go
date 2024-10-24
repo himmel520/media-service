@@ -42,7 +42,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			adv.GET("/", h.getAdvsWithFilter)
 		}
-		
+
 		// admin
 		admin := api.Group("/admin", h.jwtAdminAccess())
 		{

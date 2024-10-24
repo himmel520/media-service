@@ -51,6 +51,7 @@ func main() {
 
 	handler := httpctrl.New(usecase, log)
 
+
 	// сервер
 	app := server.New(handler.InitRoutes(), cfg.Srv.Addr)
 	go func() {
