@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -206,12 +207,13 @@ func TestDeleteCategoriesCache(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockAdvUsecase := new(mocks.AdvUC)
+			var wg sync.WaitGroup
 			h := &Handler{&usecase.Usecase{Adv: mockAdvUsecase}, logrus.New()}
 
 			tc.mockBehaviour(mockAdvUsecase)
 
 			router := gin.New()
-			router.Use(h.deleteCategoriesCache())
+			router.Use(h.deleteCategoriesCache(&wg))
 			router.GET("/test", func(c *gin.Context) {
 				c.Status(http.StatusOK)
 			})
@@ -226,6 +228,8 @@ func TestDeleteCategoriesCache(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			router.ServeHTTP(w, req)
+
+			wg.Wait()
 
 			assert.Equal(t, tc.wantStatusCode, w.Code)
 			mockAdvUsecase.AssertExpectations(t)

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/controller"
@@ -24,7 +25,6 @@ func (h *Handler) validateID() gin.HandlerFunc {
 		}
 	}
 }
-
 
 func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -54,7 +54,7 @@ func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 	}
 }
 
-func (h *Handler) deleteCategoriesCache() gin.HandlerFunc {
+func (h *Handler) deleteCategoriesCache(wg *sync.WaitGroup) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Исключаем метод Get, тк не вносит никаких изменений
 		if c.Request.Method == http.MethodGet {
@@ -68,8 +68,9 @@ func (h *Handler) deleteCategoriesCache() gin.HandlerFunc {
 		if c.IsAborted() {
 			return
 		}
-
+		wg.Add(1)
 		go func() {
+			defer wg.Done()
 			// удаление кэша в фоне
 			if err := h.uc.Adv.DeleteCache(context.Background()); err != nil {
 				h.log.Error(err)
