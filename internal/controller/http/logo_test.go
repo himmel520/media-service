@@ -76,10 +76,13 @@ func TestGetLogo(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockLogoService := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoService}, logrus.New()}
+			mockLogoUsecase := new(mocks.LogoUC)
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
-			tc.mockBehaviour(mockLogoService, tc.args)
+			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
 			router := gin.Default()
 			router.GET("/logos/:id", handler.getLogo)
@@ -91,7 +94,7 @@ func TestGetLogo(t *testing.T) {
 
 			assert.Equal(t, tc.wantStatusCode, w.Code)
 			assert.JSONEq(t, tc.wantRespBody, w.Body.String())
-			mockLogoService.AssertExpectations(t)
+			mockLogoUsecase.AssertExpectations(t)
 		})
 	}
 }
@@ -149,10 +152,13 @@ func TestGetLogos(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockLogoService := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoService}, logrus.New()}
+			mockLogoUsecase := new(mocks.LogoUC)
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
-			tc.mockBehaviour(mockLogoService)
+			tc.mockBehaviour(mockLogoUsecase)
 
 			router := gin.Default()
 			router.GET("/logos", handler.getLogos)
@@ -164,7 +170,7 @@ func TestGetLogos(t *testing.T) {
 
 			assert.Equal(t, tc.wantStatusCode, w.Code)
 			assert.JSONEq(t, tc.wantRespBody, w.Body.String())
-			mockLogoService.AssertExpectations(t)
+			mockLogoUsecase.AssertExpectations(t)
 
 		})
 	}
@@ -291,10 +297,13 @@ func TestAddLogo(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockLogoService := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoService}, logrus.New()}
+			mockLogoUsecase := new(mocks.LogoUC)
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
-			tc.mockBehaviour(mockLogoService, tc.args)
+			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
 			router := gin.Default()
 			router.POST("/logos", handler.addLogo)
@@ -306,7 +315,7 @@ func TestAddLogo(t *testing.T) {
 
 			assert.Equal(t, tc.wantStatusCode, w.Code)
 			assert.JSONEq(t, tc.wantRespBody, w.Body.String())
-			mockLogoService.AssertExpectations(t)
+			mockLogoUsecase.AssertExpectations(t)
 		})
 	}
 }
@@ -469,10 +478,13 @@ func TestUpdateLogo(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockLogoService := new(mocks.LogoUC)
-			handler := &Handler{&usecase.Usecase{Logo: mockLogoService}, logrus.New()}
+			mockLogoUsecase := new(mocks.LogoUC)
+			handler := &Handler{
+				uc:  &usecase.Usecase{Logo: mockLogoUsecase},
+				log: logrus.New(),
+			}
 
-			tc.mockBehaviour(mockLogoService, tc.args)
+			tc.mockBehaviour(mockLogoUsecase, tc.args)
 
 			router := gin.Default()
 			router.PUT("/logos/:id", handler.updateLogo)
@@ -484,7 +496,7 @@ func TestUpdateLogo(t *testing.T) {
 
 			assert.Equal(t, tc.wantStatusCode, w.Code)
 			assert.JSONEq(t, tc.wantRespBody, w.Body.String())
-			mockLogoService.AssertExpectations(t)
+			mockLogoUsecase.AssertExpectations(t)
 		})
 	}
 }
