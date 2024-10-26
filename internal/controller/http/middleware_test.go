@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -89,34 +90,34 @@ func TestJwtAdminAccess(t *testing.T) {
 		wantStatusCode int
 		wantRespBody   string
 	}{
-		// {
-			// 	name: "OK",
-			// 	args: args{
-			// 		token: "Bearer TODO: Брать безопасно",
-			// 		user:  "admin",
-			// 	},
-			// 	mockBehaviour: func(m *mocks.AuthUC, args args) {
-			// 		token := strings.TrimPrefix(args.token, "Bearer ")
-			// 		m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
-			// 		m.On("IsUserAdmin", args.user).Return(true).Once()
-			// 	},
-			// 	wantStatusCode: http.StatusOK,
-			// 	wantRespBody:   "",
-			// },
-			// {
-			// 	name: "invalid user role",
-			// 	args: args{
-			// 		token: "Bearer TODO: Брать безопасно",
-			// 		user:  "invalid",
-			// 	},
-			// 	mockBehaviour: func(m *mocks.AuthUC, args args) {
-			// 		token := strings.TrimPrefix(args.token, "Bearer ")
-			// 		m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
-			// 		m.On("IsUserAdmin", args.user).Return(false).Once()
-			// 	},
-			// 	wantStatusCode: http.StatusForbidden,
-			// 	wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrForbidden),
-		// },
+		{
+			name: "OK",
+			args: args{
+				token: "Bearer token",
+				user:  "admin",
+			},
+			mockBehaviour: func(m *mocks.AuthUC, args args) {
+				token := strings.TrimPrefix(args.token, "Bearer ")
+				m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
+				m.On("IsUserAdmin", args.user).Return(true).Once()
+			},
+			wantStatusCode: http.StatusOK,
+			wantRespBody:   "",
+		},
+		{
+			name: "invalid user role",
+			args: args{
+				token: "Bearer token",
+				user:  "invalid",
+			},
+			mockBehaviour: func(m *mocks.AuthUC, args args) {
+				token := strings.TrimPrefix(args.token, "Bearer ")
+				m.On("GetUserRoleFromToken", token).Return(args.user, nil).Once()
+				m.On("IsUserAdmin", args.user).Return(false).Once()
+			},
+			wantStatusCode: http.StatusForbidden,
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrForbidden),
+		},
 		{
 			name: "Empty auth header",
 			args: args{
