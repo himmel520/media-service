@@ -3,7 +3,7 @@ deep:
 .PHONY: deep
 
 run:
-	docker compose -f compose.yml up --build --no-log-prefix --attach media
+	docker compose -f docker/dev/dev.yml up --build --no-log-prefix --attach media
 .PHONY: run
 
 cover-html: ### run test with coverage and open html report
