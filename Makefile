@@ -3,8 +3,12 @@ deep:
 .PHONY: deep
 
 run:
-	docker compose -f docker/dev/dev.yml up --build --no-log-prefix --attach media
+	docker compose -f docker/dev/dev.yml up --no-log-prefix --attach media
 .PHONY: run
+
+prod:
+	docker compose -f docker/dev/dev.yml up --build --no-log-prefix --attach media
+.PHONY: prod
 
 cover-html: ### run test with coverage and open html report
 	go test -coverprofile=coverage.out ./...
