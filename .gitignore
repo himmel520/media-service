@@ -3,3 +3,4 @@
 **/.env
 **/*.vscode
 pg_media_data
+tmp/
