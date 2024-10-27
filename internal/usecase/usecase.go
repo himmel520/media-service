@@ -65,7 +65,7 @@ func New(repo *repository.Repository, cache *cache.Cache, publicKey rsa.PublicKe
 		Adv:   NewAdvUsecase(repo.AdvRepo, cache.Adv, log),
 		Auth:  NewAuthUsecase(publicKey),
 		Color: NewColorUsecase(repo.ColorRepo, log),
-		Logo:  NewLogoUsecase(repo.LogoRepo, log),
+		Logo:  NewLogoUsecase(repo.LogoRepo, cache.Adv, log),
 		TG:    NewTGUsecase(repo.TGRepo, log),
 	}
 }

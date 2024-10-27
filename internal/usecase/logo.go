@@ -4,18 +4,20 @@ import (
 	"context"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
 
 	"github.com/sirupsen/logrus"
 )
 
 type LogoUsecase struct {
-	repo repository.LogoRepo
-	log  *logrus.Logger
+	repo  repository.LogoRepo
+	cache cache.AdvCache
+	log   *logrus.Logger
 }
 
-func NewLogoUsecase(repo repository.LogoRepo, log *logrus.Logger) *LogoUsecase {
-	return &LogoUsecase{repo: repo, log: log}
+func NewLogoUsecase(repo repository.LogoRepo, cache cache.AdvCache, log *logrus.Logger) *LogoUsecase {
+	return &LogoUsecase{repo: repo, cache: cache, log: log}
 }
 
 func (uc *LogoUsecase) Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error) {
