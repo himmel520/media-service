@@ -147,8 +147,20 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 	c.JSON(http.StatusOK, logos)
 }
 
+// @Summary Получить список логотипов
+// @Description Возвращает список всех логотипов
+// @Tags logos
+// @Produce json
+// @Success 200 {object} entity.LogosResp "Список логотипов"
+// @Failure 400 {object} errorResponse "Неверные данные"
+// @Failure 404 {object} errorResponse "Логотипы не найдены"
+// @Failure 500 {object} errorResponse "Внутренняя ошибка сервера"
+// @Router /logos [get]
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
+	// TODO: обертка нужна
+	// Вместо swith - можно написать обертку принимающюю неопределенное кол-во ошибок
+	// тогда этот switch будет в одном месте
 	switch {
 	case errors.Is(err, repoerr.ErrLogoNotFound):
 		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
