@@ -17,12 +17,12 @@ func NewAuthUsecase(publicKey rsa.PublicKey) *AuthUsecase {
 	return &AuthUsecase{publicKey: publicKey}
 }
 
-func (s *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
+func (uc *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
 	token, err := jwt.Parse(jwtToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("unexpected signing method")
 		}
-		return s.publicKey, nil
+		return &uc.publicKey, nil
 	})
 	if err != nil {
 		return "", fmt.Errorf("error parsing token: %v", err)
@@ -41,6 +41,6 @@ func (s *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
 	return role, err
 }
 
-func (s *AuthUsecase) IsUserAdmin(userRole string) bool {
+func (uc *AuthUsecase) IsUserAdmin(userRole string) bool {
 	return userRole == entity.RoleAdmin
 }
