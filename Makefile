@@ -7,7 +7,7 @@ run:
 .PHONY: run
 
 prod:
-	docker compose -f docker/dev/dev.yml up --build --no-log-prefix --attach media
+	docker compose -f docker/prod/prod.yml up --build --no-log-prefix --attach media
 .PHONY: prod
 
 cover-html: ### run test with coverage and open html report
