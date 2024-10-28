@@ -6,9 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	con "github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 // @Summary Добавить новый логотип
@@ -30,7 +28,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoExist})
+		checkRepoErr(h, c, err)
 	}
 
 	c.JSON(http.StatusCreated, newLogo)
@@ -64,7 +62,7 @@ func (h *Handler) updateLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoExist, repoerr.ErrLogoNotFound})
+		checkRepoErr(h, c, err)
 	}
 
 	c.JSON(http.StatusOK, newLogo)
@@ -85,7 +83,7 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoDependency, repoerr.ErrLogoNotFound})
+		checkRepoErr(h, c, err)
 	}
 
 	c.Status(http.StatusNoContent)
@@ -110,7 +108,7 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
+		checkRepoErr(h, c, err)
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -128,7 +126,7 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
+		checkRepoErr(h, c, err)
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -148,7 +146,7 @@ func (h *Handler) getLogo(c *gin.Context) {
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
 	if err != nil {
-		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
+		checkRepoErr(h, c, err)
 	}
 
 	c.JSON(http.StatusOK, logo)
