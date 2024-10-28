@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -18,7 +19,7 @@ import (
 
 type AdvCache interface {
 	Set(ctx context.Context, key string, advs any) error
-	Get(ctx context.Context, key string) (any, error)
+	Get(ctx context.Context, key string) (string, error)
 	Delete(ctx context.Context) error
 }
 
@@ -56,12 +57,15 @@ func (uc *AdvUsecase) Update(ctx context.Context, id int, adv *entity.AdvUpdate)
 func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*entity.AdvResponse, error) {
 	key := uc.generateCacheKey(limit, offset, posts, priority)
 
-	advs, err := uc.cache.Get(ctx, key)
-	if err != nil {
-		if !errors.Is(err, errcache.ErrKeyNotFound) {
-			uc.log.Error(err)
-		}
+	val, err := uc.cache.Get(ctx, key)
+	if !errors.Is(err, errcache.ErrKeyNotFound) {
+		uc.log.Error(err)
+	}
 
+	advs := []*entity.AdvResponse{}
+	err = json.Unmarshal([]byte(val), &advs)
+
+	if err != nil {
 		advs, err = uc.repo.GetAllWithFilter(ctx, limit, offset, posts, priority)
 		if err != nil {
 			return nil, err
@@ -73,8 +77,7 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 	}
 	// TODO: надо протестить руками
 	// TODO: решается дженериками для методов, но так как они не работают из Get возвращается any
-	var res = advs.([]*entity.AdvResponse)
-	return res, nil
+	return advs, nil
 }
 
 func (uc *AdvUsecase) DeleteCache(ctx context.Context) error {

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
 	"github.com/redis/go-redis/v9"
 )
@@ -43,19 +42,16 @@ func (r *Cache) Set(ctx context.Context, key string, advs any) error {
 	return err
 }
 
-func (r *Cache) Get(ctx context.Context, key string) (any, error) {
+func (r *Cache) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
-			return nil, errcache.ErrKeyNotFound
+			return "", errcache.ErrKeyNotFound
 		}
-		return nil, err
+		return "", err
 	}
 
-	advs := []*entity.AdvResponse{}
-	err = json.Unmarshal([]byte(val), &advs)
-
-	return advs, err
+	return val, err
 }
 
 func (r *Cache) Delete(ctx context.Context) error {
