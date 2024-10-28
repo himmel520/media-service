@@ -28,8 +28,8 @@ type AdvUsecase struct {
 	log   *logrus.Logger
 }
 
-func NewAdvUsecase(repo repository.AdvRepo, cache cache.Cache, log *logrus.Logger) *AdvUsecase {
-	return &AdvUsecase{repo: repo, cache: cache, log: log}
+func NewAdvUsecase(repo repository.AdvRepo, cache *cache.Cache, log *logrus.Logger) *AdvUsecase {
+	return &AdvUsecase{repo: repo, cache: cache.Client, log: log}
 }
 
 func (uc *AdvUsecase) Add(ctx context.Context, adv *entity.Adv) (*entity.AdvResponse, error) {
