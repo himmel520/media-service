@@ -5,35 +5,45 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
+
+type HttpSignalError interface {
+	error
+	Status() int
+}
 
 type errorResponse struct {
 	Message string `json:"message"`
 }
 
-func checkRepoErr(h *Handler, c *gin.Context, err error) {
-	switch {
-	case errors.Is(err, repoerr.ErrLogoExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-
-	case errors.Is(err, repoerr.ErrLogoDependency):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-
-	}
-	h.log.Error(err.Error())
-	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-
+type HttpError struct {
+	message string
+	status  int
 }
 
-func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []controller.SignalError) {
+func NewHttpError(message string, status int) *HttpError {
+	return &HttpError{
+		message: message,
+		status:  status,
+	}
+}
+
+func (e *HttpError) Error() string {
+	return e.message
+}
+
+func (e *HttpError) Status() int {
+	return e.status
+}
+
+var (
+	ErrInvalidID         = NewHttpError("invalid id", http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewHttpError("authorization header is missing", http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewHttpError("authorization header is invalid", http.StatusUnauthorized)
+	ErrForbidden         = NewHttpError("you don't have access to this resource", http.StatusForbidden)
+)
+
+func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSignalError) {
 	for _, sigerr := range signalErrors {
 		if errors.Is(err, sigerr) {
 			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{sigerr.Error()})
@@ -45,14 +55,14 @@ func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []controll
 
 }
 
-func wrapToHttpErr(errs []error, statuses []int) []controller.SignalError {
+func wrapToHttpErr(errs []error, statuses []int) []HttpSignalError {
 	if len(errs) != len(statuses) {
 		return nil
 	}
 
-	var wrappedErrors []controller.SignalError
+	var wrappedErrors []HttpSignalError
 	for i, err := range errs {
-		wrappedError := controller.NewHttpError(err.Error(), statuses[i])
+		wrappedError := NewHttpError(err.Error(), statuses[i])
 		wrappedErrors = append(wrappedErrors, wrappedError)
 	}
 
