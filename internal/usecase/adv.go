@@ -17,8 +17,8 @@ import (
 )
 
 type AdvCache interface {
-	Set(ctx context.Context, key string, advs []*entity.AdvResponse) error
-	Get(ctx context.Context, key string) ([]*entity.AdvResponse, error)
+	Set(ctx context.Context, key string, advs any) error
+	Get(ctx context.Context, key string) (any, error)
 	Delete(ctx context.Context) error
 }
 
@@ -62,19 +62,19 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 			uc.log.Error(err)
 		}
 
-		// идем в бд
 		advs, err = uc.repo.GetAllWithFilter(ctx, limit, offset, posts, priority)
 		if err != nil {
 			return nil, err
 		}
 
-		// сохраняем в кэш
 		if err := uc.cache.Set(ctx, key, advs); err != nil {
 			uc.log.Error(err)
 		}
 	}
-
-	return advs, nil
+	// TODO: надо протестить руками
+	// TODO: решается дженериками для методов, но так как они не работают из Get возвращается any
+	var res = advs.([]*entity.AdvResponse)
+	return res, nil
 }
 
 func (uc *AdvUsecase) DeleteCache(ctx context.Context) error {
