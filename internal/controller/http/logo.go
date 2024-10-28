@@ -1,13 +1,12 @@
 package httpctrl
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller"
+	con "github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
@@ -31,14 +30,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		if errors.Is(err, repoerr.ErrLogoExist) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-			return
-		}
-
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoExist})
 	}
 
 	c.JSON(http.StatusCreated, newLogo)
@@ -72,7 +64,7 @@ func (h *Handler) updateLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
 	if err != nil {
-		checkErr(h, c, err, []controller.SignalError{repoerr.ErrLogoExist, repoerr.ErrLogoNotFound})
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoExist, repoerr.ErrLogoNotFound})
 	}
 
 	c.JSON(http.StatusOK, newLogo)
@@ -92,17 +84,8 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoDependency):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+	if err != nil {
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoDependency, repoerr.ErrLogoNotFound})
 	}
 
 	c.Status(http.StatusNoContent)
@@ -126,14 +109,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 	}
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+	if err != nil {
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -150,17 +127,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 // @Router /logos [get]
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
-	// TODO: обертка нужна
-	// Вместо swith - можно написать обертку принимающюю неопределенное кол-во ошибок
-	// тогда этот switch будет в одном месте
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+	if err != nil {
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -179,14 +147,8 @@ func (h *Handler) getLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+	if err != nil {
+		checkErr(h, c, err, []con.SignalError{repoerr.ErrLogoNotFound})
 	}
 
 	c.JSON(http.StatusOK, logo)
