@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
@@ -70,17 +71,8 @@ func (h *Handler) updateLogo(c *gin.Context) {
 	}
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
+	if err != nil {
+		checkErr(h, c, err, []controller.SignalError{repoerr.ErrLogoExist, repoerr.ErrLogoNotFound})
 	}
 
 	c.JSON(http.StatusOK, newLogo)

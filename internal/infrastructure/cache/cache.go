@@ -13,7 +13,8 @@ import (
 
 type (
 	Cache struct {
-		Adv AdvCache
+		Adv  AdvCache
+		Logo AdvCache
 	}
 
 	AdvCache interface {
