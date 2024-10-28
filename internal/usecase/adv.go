@@ -58,6 +58,9 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 	key := uc.generateCacheKey(limit, offset, posts, priority)
 
 	val, err := uc.cache.Get(ctx, key)
+
+	// хочется пояснить но потом надо убрать, игнорируются все ошибки из кэша так как не имеет смысла прерывать запрос
+	// таким образом увеличиться надежность
 	if !errors.Is(err, errcache.ErrKeyNotFound) {
 		uc.log.Error(err)
 	}
