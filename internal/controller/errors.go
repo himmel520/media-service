@@ -1,10 +1,35 @@
 package controller
 
-import "errors"
+import "net/http"
+
+type SignalError interface {
+	error
+	Status() int
+}
+
+type CustomError struct {
+	message string
+	status  int
+}
+
+func NewCustomError(message string, status int) *CustomError {
+	return &CustomError{
+		message: message,
+		status:  status,
+	}
+}
+
+func (e *CustomError) Error() string {
+	return e.message
+}
+
+func (e *CustomError) Status() int {
+	return e.status
+}
 
 var (
-	ErrInvalidID = errors.New("invalid id")
-	ErrEmptyAuthHeader = errors.New("authorization header is missing")
-	ErrInvalidAuthHeader = errors.New("authorization header is invalid")
-	ErrForbidden = errors.New("you don't have access to this resource")
+	ErrInvalidID         = NewCustomError("invalid id", http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewCustomError("authorization header is missing", http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewCustomError("authorization header is invalid", http.StatusUnauthorized)
+	ErrForbidden         = NewCustomError("you don't have access to this resource", http.StatusForbidden)
 )
