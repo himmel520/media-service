@@ -10,6 +10,21 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
+func(h *Handler) handleAdvErr(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, repoerr.ErrAdvNotFound):
+		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
+		return
+	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
+		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
+		return
+	case err != nil:
+		h.log.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		return
+	}
+}
+
 // @Summary Добавить новое объявление
 // @Description Создает новое объявление на основе переданных данных
 // @Tags adv
@@ -29,12 +44,8 @@ func (h *Handler) addAdv(c *gin.Context) {
 	}
 
 	advResp, err := h.uc.Adv.Add(c.Request.Context(), adv)
-	switch {
-	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case err != nil:
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleAdvErr(c, err)
 		return
 	}
 
@@ -54,12 +65,8 @@ func (h *Handler) deleteAdv(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Adv.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrAdvNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleAdvErr(c, err)
 		return
 	}
 
@@ -94,15 +101,8 @@ func (h *Handler) updateAdv(c *gin.Context) {
 	}
 
 	advResp, err := h.uc.Adv.Update(c.Request.Context(), id, adv)
-	switch {
-	case errors.Is(err, repoerr.ErrAdvNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case err != nil:
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleAdvErr(c, err)
 		return
 	}
 
@@ -131,12 +131,8 @@ func (h *Handler) getAdvsWithFilter(c *gin.Context) {
 	}
 
 	advs, err := h.uc.Adv.GetAllWithFilter(c.Request.Context(), query.Limit, query.Offset, query.Post, query.Priority)
-	switch {
-	case errors.Is(err, repoerr.ErrAdvNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleAdvErr(c, err)
 		return
 	}
 

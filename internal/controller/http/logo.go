@@ -11,6 +11,24 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
+func(h *Handler) handleLogoErr(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, repoerr.ErrLogoExist):
+		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
+		return
+	case errors.Is(err, repoerr.ErrLogoNotFound):
+		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
+		return
+	case errors.Is(err, repoerr.ErrLogoDependency):
+		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
+		return
+	case err != nil:
+		h.log.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		return
+	}
+}
+
 // @Summary Добавить новый логотип
 // @Description Создает новый логотип
 // @Tags logos
@@ -30,13 +48,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		if errors.Is(err, repoerr.ErrLogoExist) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-			return
-		}
-
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		h.handleLogoErr(c, err)
 		return
 	}
 
@@ -70,16 +82,8 @@ func (h *Handler) updateLogo(c *gin.Context) {
 	}
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleLogoErr(c, err)
 		return
 	}
 
@@ -100,16 +104,8 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoDependency):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleLogoErr(c, err)
 		return
 	}
 
@@ -134,13 +130,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 	}
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleLogoErr(c, err)
 		return
 	}
 
@@ -149,13 +140,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleLogoErr(c, err)
 		return
 	}
 
@@ -175,13 +161,8 @@ func (h *Handler) getLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleLogoErr(c, err)
 		return
 	}
 

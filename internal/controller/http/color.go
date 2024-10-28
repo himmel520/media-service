@@ -11,6 +11,24 @@ import (
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
+func(h *Handler) handleColorErr(c *gin.Context, err error) {
+	switch {
+	case errors.Is(err, repoerr.ErrColorHexExist):
+		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
+		return
+	case errors.Is(err, repoerr.ErrColorNotFound):
+		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
+		return
+	case errors.Is(err, repoerr.ErrColorDependencyExist):
+		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
+		return
+	case err != nil:
+		h.log.Error(err.Error())
+		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		return
+	}
+}
+
 // @Summary Добавить новый цвет
 // @Description Создает новый цвет
 // @Tags colors
@@ -29,16 +47,9 @@ func (h *Handler) addColor(c *gin.Context) {
 	}
 
 	newColor, err := h.uc.Color.Add(c.Request.Context(), color)
-	switch {
-	case errors.Is(err, repoerr.ErrColorHexExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
+	if err != nil {
+		h.handleColorErr(c, err)
 		return
-
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
-
 	}
 
 	c.JSON(http.StatusCreated, newColor)
@@ -71,16 +82,8 @@ func (h *Handler) updateColor(c *gin.Context) {
 	}
 
 	newColor, err := h.uc.Color.Update(c.Request.Context(), id, color)
-	switch {
-	case errors.Is(err, repoerr.ErrColorHexExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleColorErr(c, err)
 		return
 	}
 
@@ -101,16 +104,8 @@ func (h *Handler) deleteColor(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Color.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrColorDependencyExist):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleColorErr(c, err)
 		return
 	}
 
@@ -135,13 +130,8 @@ func (h *Handler) getColors(c *gin.Context) {
 	}
 
 	colors, err := h.uc.Color.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		h.handleColorErr(c, err)
 		return
 	}
 
