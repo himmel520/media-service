@@ -3,6 +3,7 @@ module github.com/himmel520/uoffer/mediaAd
 go 1.22.3
 
 require (
+	github.com/bsm/gomega v1.27.10
 	github.com/gin-gonic/gin v1.9.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0

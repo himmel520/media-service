@@ -7,23 +7,23 @@ type SignalError interface {
 	Status() int
 }
 
-type CustomError struct {
+type HttpError struct {
 	message string
 	status  int
 }
 
-func NewCustomError(message string, status int) *CustomError {
-	return &CustomError{
+func NewCustomError(message string, status int) *HttpError {
+	return &HttpError{
 		message: message,
 		status:  status,
 	}
 }
 
-func (e *CustomError) Error() string {
+func (e *HttpError) Error() string {
 	return e.message
 }
 
-func (e *CustomError) Status() int {
+func (e *HttpError) Status() int {
 	return e.status
 }
 
