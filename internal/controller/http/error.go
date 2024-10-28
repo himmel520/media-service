@@ -44,3 +44,17 @@ func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []controll
 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
 
 }
+
+func wrapToHttpErr(errs []error, statuses []int) []controller.SignalError {
+	if len(errs) != len(statuses) {
+		return nil
+	}
+
+	var wrappedErrors []controller.SignalError
+	for i, err := range errs {
+		wrappedError := controller.NewHttpError(err.Error(), statuses[i])
+		wrappedErrors = append(wrappedErrors, wrappedError)
+	}
+
+	return wrappedErrors
+}
