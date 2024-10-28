@@ -78,8 +78,6 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 			uc.log.Error(err)
 		}
 	}
-	// TODO: надо протестить руками
-	// TODO: решается дженериками для методов, но так как они не работают из Get возвращается any
 	return advs, nil
 }
 
