@@ -32,13 +32,13 @@ func NewClient(db *redis.Client, exp time.Duration) *Cache {
 
 }
 
-func (r *Cache) Set(ctx context.Context, key string, advs any) error {
-	advsByte, err := json.Marshal(advs)
+func (r *Cache) Set(ctx context.Context, key string, value any) error {
+	byte, err := json.Marshal(value)
 	if err != nil {
 		return err
 	}
 
-	_, err = r.rdb.Set(ctx, key, string(advsByte), r.exp).Result()
+	_, err = r.rdb.Set(ctx, key, string(byte), r.exp).Result()
 	return err
 }
 
@@ -54,8 +54,8 @@ func (r *Cache) Get(ctx context.Context, key string) (string, error) {
 	return val, err
 }
 
-func (r *Cache) Delete(ctx context.Context) error {
-	keys, err := r.rdb.Keys(ctx, "advs:*").Result()
+func (r *Cache) Delete(ctx context.Context, prefix string) error {
+	keys, err := r.rdb.Keys(ctx, prefix).Result()
 	if err != nil {
 		return err
 	}

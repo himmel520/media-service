@@ -2,8 +2,12 @@ package usecase
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
@@ -13,10 +17,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const advCachePrefix = "advs:*"
+
 type AdvCache interface {
 	Set(ctx context.Context, key string, advs any) error
 	Get(ctx context.Context, key string) (string, error)
-	Delete(ctx context.Context) error
+	Delete(ctx context.Context, prefix string) error
 }
 
 type AdvUsecase struct {
@@ -51,7 +57,7 @@ func (uc *AdvUsecase) Update(ctx context.Context, id int, adv *entity.AdvUpdate)
 }
 
 func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*entity.AdvResponse, error) {
-	key := GenerateCacheKey(limit, offset, posts, priority)
+	key := generateCacheKeyAdv(limit, offset, posts, priority)
 
 	val, err := uc.cache.Get(ctx, key)
 
@@ -78,5 +84,16 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 }
 
 func (uc *AdvUsecase) DeleteCache(ctx context.Context) error {
-	return uc.cache.Delete(ctx)
+	return uc.cache.Delete(ctx, advCachePrefix)
+}
+
+func generateCacheKeyAdv(limit, offset int, posts, priority []string) string {
+	key := fmt.Sprintf("%d:%d:%s:%s", limit, offset, strings.Join(posts, ","), strings.Join(priority, ","))
+
+	// Создаем хеш
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	return advCachePrefix + hash
 }
