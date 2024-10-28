@@ -12,12 +12,12 @@ import (
 
 type LogoUsecase struct {
 	repo  repository.LogoRepo
-	cache cache.AdvCache
+	cache cache.Cache
 	log   *logrus.Logger
 }
 
-func NewLogoUsecase(repo repository.LogoRepo, cache cache.AdvCache, log *logrus.Logger) *LogoUsecase {
-	return &LogoUsecase{repo: repo, cache: cache, log: log}
+func NewLogoUsecase(repo repository.LogoRepo, log *logrus.Logger) *LogoUsecase {
+	return &LogoUsecase{repo: repo, log: log}
 }
 
 func (uc *LogoUsecase) Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error) {

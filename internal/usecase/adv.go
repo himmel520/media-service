@@ -16,13 +16,19 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type AdvCache interface {
+	Set(ctx context.Context, key string, advs []*entity.AdvResponse) error
+	Get(ctx context.Context, key string) ([]*entity.AdvResponse, error)
+	Delete(ctx context.Context) error
+}
+
 type AdvUsecase struct {
 	repo  repository.AdvRepo
-	cache cache.AdvCache
+	cache AdvCache
 	log   *logrus.Logger
 }
 
-func NewAdvUsecase(repo repository.AdvRepo, cache cache.AdvCache, log *logrus.Logger) *AdvUsecase {
+func NewAdvUsecase(repo repository.AdvRepo, cache cache.Cache, log *logrus.Logger) *AdvUsecase {
 	return &AdvUsecase{repo: repo, cache: cache, log: log}
 }
 
