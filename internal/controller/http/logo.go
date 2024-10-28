@@ -29,7 +29,8 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.JSON(http.StatusCreated, newLogo)
@@ -63,7 +64,8 @@ func (h *Handler) updateLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.JSON(http.StatusOK, newLogo)
@@ -110,7 +112,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -128,7 +131,8 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -148,7 +152,8 @@ func (h *Handler) getLogo(c *gin.Context) {
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.JSON(http.StatusOK, logo)
