@@ -9,10 +9,10 @@ import (
 
 //go:generate mockery --all
 type Cache struct {
-	client *redis.Cache
+	Client *redis.Cache
 }
 
 func New(db *goredis.Client, exp time.Duration) *Cache {
 	client := redis.NewClient(db, exp)
-	return &Cache{client: client}
+	return &Cache{Client: client}
 }
