@@ -33,7 +33,7 @@ func NewClient(db *redis.Client, exp time.Duration) *Cache {
 
 }
 
-func (r *Cache) Set(ctx context.Context, key string, advs []*entity.AdvResponse) error {
+func (r *Cache) Set(ctx context.Context, key string, advs any) error {
 	advsByte, err := json.Marshal(advs)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (r *Cache) Set(ctx context.Context, key string, advs []*entity.AdvResponse)
 	return err
 }
 
-func (r *Cache) Get(ctx context.Context, key string) ([]*entity.AdvResponse, error) {
+func (r *Cache) Get(ctx context.Context, key string) (any, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
 		if err == redis.Nil {
