@@ -7,6 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 // @Summary Добавить новый логотип
@@ -83,7 +84,8 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
 	if err != nil {
-		checkRepoErr(h, c, err)
+		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
+			[]int{404, 409, 400}))
 	}
 
 	c.Status(http.StatusNoContent)

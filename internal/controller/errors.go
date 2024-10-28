@@ -12,7 +12,7 @@ type HttpError struct {
 	status  int
 }
 
-func NewCustomError(message string, status int) *HttpError {
+func NewHttpError(message string, status int) *HttpError {
 	return &HttpError{
 		message: message,
 		status:  status,
@@ -28,8 +28,8 @@ func (e *HttpError) Status() int {
 }
 
 var (
-	ErrInvalidID         = NewCustomError("invalid id", http.StatusBadRequest)
-	ErrEmptyAuthHeader   = NewCustomError("authorization header is missing", http.StatusUnauthorized)
-	ErrInvalidAuthHeader = NewCustomError("authorization header is invalid", http.StatusUnauthorized)
-	ErrForbidden         = NewCustomError("you don't have access to this resource", http.StatusForbidden)
+	ErrInvalidID         = NewHttpError("invalid id", http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewHttpError("authorization header is missing", http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewHttpError("authorization header is invalid", http.StatusUnauthorized)
+	ErrForbidden         = NewHttpError("you don't have access to this resource", http.StatusForbidden)
 )
