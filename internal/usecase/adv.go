@@ -2,12 +2,8 @@ package usecase
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"strings"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
@@ -55,7 +51,7 @@ func (uc *AdvUsecase) Update(ctx context.Context, id int, adv *entity.AdvUpdate)
 }
 
 func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*entity.AdvResponse, error) {
-	key := uc.generateCacheKey(limit, offset, posts, priority)
+	key := GenerateCacheKey(limit, offset, posts, priority)
 
 	val, err := uc.cache.Get(ctx, key)
 
@@ -83,15 +79,4 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 
 func (uc *AdvUsecase) DeleteCache(ctx context.Context) error {
 	return uc.cache.Delete(ctx)
-}
-
-func (uc *AdvUsecase) generateCacheKey(limit, offset int, posts, priority []string) string {
-	key := fmt.Sprintf("%d:%d:%s:%s", limit, offset, strings.Join(posts, ","), strings.Join(priority, ","))
-
-	// Создаем хеш
-	hasher := md5.New()
-	hasher.Write([]byte(key))
-	hash := hex.EncodeToString(hasher.Sum(nil))
-
-	return "advs:" + hash
 }

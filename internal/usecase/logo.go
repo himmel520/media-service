@@ -10,14 +10,17 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+type LogoCache interface {
+	Get(ctx context.Context, key string) (string, error)
+}
 type LogoUsecase struct {
 	repo  repository.LogoRepo
-	cache cache.Cache
+	cache LogoCache
 	log   *logrus.Logger
 }
 
-func NewLogoUsecase(repo repository.LogoRepo, log *logrus.Logger) *LogoUsecase {
-	return &LogoUsecase{repo: repo, log: log}
+func NewLogoUsecase(repo repository.LogoRepo, cache *cache.Cache, log *logrus.Logger) *LogoUsecase {
+	return &LogoUsecase{repo: repo, cache: cache.Client, log: log}
 }
 
 func (uc *LogoUsecase) Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error) {
