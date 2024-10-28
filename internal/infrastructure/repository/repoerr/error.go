@@ -35,7 +35,7 @@ func (e *RepoError) Status() int {
 // Logo
 var (
 	ErrLogoNotFound   = NewRepoErr("logo not found", http.StatusNotFound)
-	ErrLogoExist      = NewRepoErr("logo url must be unique", http.StatusConflict)
+	ErrLogoExist      = NewRepoErr("logo url must be unique", http.StatusBadRequest)
 	ErrLogoDependency = NewRepoErr("cannot delete object, it is linked to adv", http.StatusConflict)
 )
 

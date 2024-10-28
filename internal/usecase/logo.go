@@ -67,7 +67,6 @@ func (uc *LogoUsecase) GetAllWithPagination(ctx context.Context, limit, offset i
 		if err != nil {
 			return nil, err
 		}
-
 		return &entity.LogosResp{
 			Logos: logos,
 			Total: len(logos),
@@ -83,9 +82,8 @@ func (uc *LogoUsecase) GetAllWithPagination(ctx context.Context, limit, offset i
 }
 
 func generateCacheKeyLogo(limit, offset int) string {
-	key := fmt.Sprintf("%d:%d:%s:%s", limit, offset)
+	key := fmt.Sprintf("%d:%d", limit, offset)
 
-	// Создаем хеш
 	hasher := md5.New()
 	hasher.Write([]byte(key))
 	hash := hex.EncodeToString(hasher.Sum(nil))
