@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
@@ -43,10 +44,10 @@ func (e *HttpError) UnWrap() error {
 }
 
 var (
-	ErrInvalidID         = NewHttpError(errors.New("invalid id"), http.StatusBadRequest)
-	ErrEmptyAuthHeader   = NewHttpError(errors.New("authorization header is missing"), http.StatusUnauthorized)
-	ErrInvalidAuthHeader = NewHttpError(errors.New("authorization header is invalid"), http.StatusUnauthorized)
-	ErrForbidden         = NewHttpError(errors.New("you don't have access to this resource"), http.StatusForbidden)
+	ErrInvalidID         = NewHttpError(controller.ErrInvalidID, http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewHttpError(controller.ErrEmptyAuthHeader, http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewHttpError(controller.ErrInvalidAuthHeader, http.StatusUnauthorized)
+	ErrForbidden         = NewHttpError(controller.ErrForbidden, http.StatusForbidden)
 
 	ErrLogoNotFound   = NewHttpError(repoerr.ErrLogoNotFound, http.StatusNotFound)
 	ErrLogoExist      = NewHttpError(repoerr.ErrLogoExist, http.StatusBadRequest)

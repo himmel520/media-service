@@ -96,7 +96,7 @@ func TestGetLogo(t *testing.T) {
 			fmt.Println(tc.wantRespBody, w.Body.String())
 
 			assert.JSONEq(t, tc.wantRespBody, w.Body.String())
-			// mockLogoUsecase.AssertExpectations(t)
+			mockLogoUsecase.AssertExpectations(t)
 		})
 	}
 }
