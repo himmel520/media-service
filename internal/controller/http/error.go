@@ -15,7 +15,7 @@ type HttpSignalError interface {
 }
 
 type errorResponse struct {
-	Message string `json:"message"`
+	Message string `json:"message,omitempty"`
 }
 
 type HttpError struct {
@@ -59,7 +59,7 @@ func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSign
 		infrastructureErr := sigerr.UnWrap()
 
 		if errors.Is(err, infrastructureErr) {
-			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{infrastructureErr.Error()})
+			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{sigerr.Error()})
 			return
 		}
 
