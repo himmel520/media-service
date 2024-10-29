@@ -1,6 +1,7 @@
 package httpctrl
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -29,8 +30,16 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoExist):
+			code = http.StatusConflict
+		default:
+			h.log.Error(err.Error())
+		}
+		
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusCreated, newLogo)
@@ -64,8 +73,18 @@ func (h *Handler) updateLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoExist):
+			code = http.StatusConflict
+		case errors.Is(err, repoerr.ErrLogoNotFound):
+			code = http.StatusNotFound
+		default:
+			h.log.Error(err.Error())
+		}
+
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, newLogo)
@@ -86,8 +105,18 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoNotFound):
+			code = http.StatusNotFound
+		case errors.Is(err, repoerr.ErrLogoDependency):
+			code = http.StatusConflict
+		default:
+			h.log.Error(err.Error())
+		}
+
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.Status(http.StatusNoContent)
@@ -112,8 +141,16 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoNotFound):
+			code = http.StatusNotFound
+		default:
+			h.log.Error(err.Error())
+		}
+
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -131,8 +168,16 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoNotFound):
+			code = http.StatusNotFound
+		default:
+			h.log.Error(err.Error())
+		}
+		
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, logos)
@@ -152,8 +197,16 @@ func (h *Handler) getLogo(c *gin.Context) {
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
 	if err != nil {
-		checkHttpErr(h, c, err, wrapToHttpErr([]error{repoerr.ErrLogoNotFound, repoerr.ErrLogoExist, repoerr.ErrLogoDependency},
-			[]int{404, 409, 400}))
+		code := http.StatusInternalServerError
+		switch {
+		case errors.Is(err, repoerr.ErrLogoNotFound):
+			code = http.StatusNotFound
+		default:
+			h.log.Error(err.Error())
+		}
+		
+		c.AbortWithStatusJSON(code, errorResponse{err.Error()})
+		return
 	}
 
 	c.JSON(http.StatusOK, logo)

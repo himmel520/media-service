@@ -228,7 +228,7 @@ func TestAddLogo(t *testing.T) {
 				m.On("Add", context.Background(), args.in).Return(nil, repoerr.ErrLogoExist)
 			},
 			inputbody:      `{"url":"http://example.com/logo.png","title":"Test Logo"}`,
-			wantStatusCode: http.StatusBadRequest,
+			wantStatusCode: http.StatusConflict,
 			wantRespBody:   `{"message":"logo url must be unique"}`,
 		},
 		{
