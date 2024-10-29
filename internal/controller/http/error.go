@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 type HttpSignalError interface {
@@ -17,19 +18,19 @@ type errorResponse struct {
 }
 
 type HttpError struct {
-	message string
-	status  int
+	error
+	status int
 }
 
-func NewHttpError(message string, status int) *HttpError {
+func NewHttpError(error error, status int) *HttpError {
 	return &HttpError{
-		message: message,
-		status:  status,
+		error:  error,
+		status: status,
 	}
 }
 
 func (e *HttpError) Error() string {
-	return e.message
+	return e.error.Error()
 }
 
 func (e *HttpError) Status() int {
@@ -37,34 +38,28 @@ func (e *HttpError) Status() int {
 }
 
 var (
-	ErrInvalidID         = NewHttpError("invalid id", http.StatusBadRequest)
-	ErrEmptyAuthHeader   = NewHttpError("authorization header is missing", http.StatusUnauthorized)
-	ErrInvalidAuthHeader = NewHttpError("authorization header is invalid", http.StatusUnauthorized)
-	ErrForbidden         = NewHttpError("you don't have access to this resource", http.StatusForbidden)
+	ErrInvalidID         = NewHttpError(errors.New("invalid id"), http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewHttpError(errors.New("authorization header is missing"), http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewHttpError(errors.New("authorization header is invalid"), http.StatusUnauthorized)
+	ErrForbidden         = NewHttpError(errors.New("you don't have access to this resource"), http.StatusForbidden)
+
+	ErrLogoNotFound   = NewHttpError(repoerr.ErrLogoNotFound, http.StatusNotFound)
+	ErrLogoExist      = NewHttpError(repoerr.ErrLogoExist, http.StatusBadRequest)
+	ErrLogoDependency = NewHttpError(repoerr.ErrLogoDependency, http.StatusConflict)
 )
 
 func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSignalError) {
 	for _, sigerr := range signalErrors {
-		if errors.Is(err, sigerr) {
-			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{sigerr.Error()})
+
+		infrastructureErr := errors.Unwrap(sigerr)
+
+		if errors.Is(err, infrastructureErr) {
+			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{infrastructureErr.Error()})
+			return
 		}
 
 	}
 	h.log.Error(err.Error())
 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
 
-}
-
-func wrapToHttpErr(errs []error, statuses []int) []HttpSignalError {
-	if len(errs) != len(statuses) {
-		return nil
-	}
-
-	var wrappedErrors []HttpSignalError
-	for i, err := range errs {
-		wrappedError := NewHttpError(err.Error(), statuses[i])
-		wrappedErrors = append(wrappedErrors, wrappedError)
-	}
-
-	return wrappedErrors
 }
