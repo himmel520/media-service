@@ -7,19 +7,18 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller"
 )
 
 func (h *Handler) validateID() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{controller.ErrInvalidID.Error()})
+			c.AbortWithStatusJSON(ErrInvalidID.status, errorResponse{ErrInvalidID.Error()})
 			return
 		}
 
 		if id <= 0 {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{controller.ErrInvalidID.Error()})
+			c.AbortWithStatusJSON(ErrInvalidID.status, errorResponse{ErrInvalidID.Error()})
 			return
 		}
 	}
@@ -29,13 +28,13 @@ func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{controller.ErrEmptyAuthHeader.Error()})
+			c.AbortWithStatusJSON(ErrEmptyAuthHeader.status, errorResponse{ErrEmptyAuthHeader.Error()})
 			return
 		}
 
 		token := strings.TrimPrefix(authHeader, "Bearer ")
 		if token == "" || token == authHeader {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, errorResponse{controller.ErrInvalidAuthHeader.Error()})
+			c.AbortWithStatusJSON(ErrInvalidAuthHeader.status, errorResponse{ErrInvalidAuthHeader.Error()})
 			return
 		}
 
@@ -47,7 +46,7 @@ func (h *Handler) jwtAdminAccess() gin.HandlerFunc {
 		}
 
 		if !h.uc.Auth.IsUserAdmin(userRole) {
-			c.AbortWithStatusJSON(http.StatusForbidden, errorResponse{controller.ErrForbidden.Error()})
+			c.AbortWithStatusJSON(ErrForbidden.status, errorResponse{ErrForbidden.Error()})
 			return
 		}
 	}
