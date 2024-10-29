@@ -1,14 +1,12 @@
 package httpctrl
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 // @Summary Добавить группу Telegram
@@ -30,13 +28,7 @@ func (h *Handler) addTG(c *gin.Context) {
 
 	newTG, err := h.uc.TG.Add(c.Request.Context(), tg)
 	if err != nil {
-		if errors.Is(err, repoerr.ErrTGExist) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-			return
-		}
-
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrTGExist})
 		return
 	}
 
@@ -61,13 +53,8 @@ func (h *Handler) getTGs(c *gin.Context) {
 	}
 
 	tgs, err := h.uc.TG.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrTGNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrTGNotFound})
 		return
 	}
 
@@ -101,16 +88,8 @@ func (h *Handler) updateTG(c *gin.Context) {
 	}
 
 	newTG, err := h.uc.TG.Update(c.Request.Context(), id, tg)
-	switch {
-	case errors.Is(err, repoerr.ErrTGExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrTGNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrTGExist, ErrTGNotFound})
 		return
 	}
 
@@ -131,16 +110,8 @@ func (h *Handler) deleteTG(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.TG.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrTGDependencyExist):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrTGNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrTGDependencyExist, ErrTGNotFound})
 		return
 	}
 
