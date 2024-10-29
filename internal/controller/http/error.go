@@ -56,9 +56,7 @@ var (
 func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSignalError) {
 	for _, sigerr := range signalErrors {
 
-		infrastructureErr := sigerr.UnWrap()
-
-		if errors.Is(err, infrastructureErr) {
+		if errors.Is(err, sigerr.UnWrap()) {
 			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{sigerr.Error()})
 			return
 		}
