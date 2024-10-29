@@ -8,7 +8,6 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase/mocks"
 	"github.com/sirupsen/logrus"
@@ -34,19 +33,19 @@ func TestValidateID(t *testing.T) {
 			name:           "Err id is 0",
 			id:             "0",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrInvalidID),
 		},
 		{
 			name:           "Err id is negative",
 			id:             "-1",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrInvalidID),
 		},
 		{
 			name:           "Err id is not a number",
 			id:             "adc",
 			wantStatusCode: http.StatusBadRequest,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidID),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrInvalidID),
 		},
 	}
 
@@ -116,7 +115,7 @@ func TestJwtAdminAccess(t *testing.T) {
 				m.On("IsUserAdmin", args.user).Return(false).Once()
 			},
 			wantStatusCode: http.StatusForbidden,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrForbidden),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrForbidden),
 		},
 		{
 			name: "Empty auth header",
@@ -125,7 +124,7 @@ func TestJwtAdminAccess(t *testing.T) {
 			},
 			mockBehaviour:  func(m *mocks.AuthUC, args args) {},
 			wantStatusCode: http.StatusUnauthorized,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrEmptyAuthHeader),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrEmptyAuthHeader),
 		},
 		{
 			name: "invalid auth header format",
@@ -134,7 +133,7 @@ func TestJwtAdminAccess(t *testing.T) {
 			},
 			mockBehaviour:  func(m *mocks.AuthUC, args args) {},
 			wantStatusCode: http.StatusUnauthorized,
-			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, controller.ErrInvalidAuthHeader),
+			wantRespBody:   fmt.Sprintf(`{"message":"%v"}`, ErrInvalidAuthHeader),
 		},
 	}
 
