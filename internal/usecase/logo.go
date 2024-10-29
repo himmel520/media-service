@@ -2,20 +2,33 @@ package usecase
 
 import (
 	"context"
+	"crypto/md5"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"fmt"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
 
 	"github.com/sirupsen/logrus"
 )
 
+const logoCachePrefix = "logo:*"
+
+type LogoCache interface {
+	Get(ctx context.Context, key string) (string, error)
+}
 type LogoUsecase struct {
-	repo repository.LogoRepo
-	log  *logrus.Logger
+	repo  repository.LogoRepo
+	cache LogoCache
+	log   *logrus.Logger
 }
 
-func NewLogoUsecase(repo repository.LogoRepo, log *logrus.Logger) *LogoUsecase {
-	return &LogoUsecase{repo: repo, log: log}
+func NewLogoUsecase(repo repository.LogoRepo, cache *cache.Cache, log *logrus.Logger) *LogoUsecase {
+	return &LogoUsecase{repo: repo, cache: cache.Client, log: log}
 }
 
 func (uc *LogoUsecase) Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error) {
@@ -39,18 +52,41 @@ func (uc *LogoUsecase) GetAll(ctx context.Context) ([]*entity.LogoResp, error) {
 }
 
 func (uc *LogoUsecase) GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.LogosResp, error) {
-	logos, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
-	if err != nil {
-		return nil, err
+	key := generateCacheKeyLogo(limit, offset)
+
+	val, err := uc.cache.Get(ctx, key)
+
+	if !errors.Is(err, errcache.ErrKeyNotFound) {
+		uc.log.Error(err)
 	}
 
-	count, err := uc.repo.Count(ctx)
+	logos := make(map[int]*entity.Logo)
+	err = json.Unmarshal([]byte(val), &logos)
 	if err != nil {
-		return nil, err
+		logos, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
+		if err != nil {
+			return nil, err
+		}
+		return &entity.LogosResp{
+			Logos: logos,
+			Total: len(logos),
+		}, err
+
 	}
 
 	return &entity.LogosResp{
 		Logos: logos,
-		Total: count,
+		Total: len(logos),
 	}, err
+
+}
+
+func generateCacheKeyLogo(limit, offset int) string {
+	key := fmt.Sprintf("%d:%d", limit, offset)
+
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	hash := hex.EncodeToString(hasher.Sum(nil))
+
+	return advCachePrefix + hash
 }

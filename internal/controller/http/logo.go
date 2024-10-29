@@ -1,14 +1,12 @@
 package httpctrl
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 // @Summary Добавить новый логотип
@@ -30,13 +28,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		if errors.Is(err, repoerr.ErrLogoExist) {
-			c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-			return
-		}
-
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
@@ -70,16 +62,8 @@ func (h *Handler) updateLogo(c *gin.Context) {
 	}
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
@@ -100,16 +84,8 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoDependency):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
@@ -134,28 +110,27 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 	}
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
 	c.JSON(http.StatusOK, logos)
 }
 
+// @Summary Получить список логотипов
+// @Description Возвращает список всех логотипов
+// @Tags logos
+// @Produce json
+// @Success 200 {object} entity.LogosResp "Список логотипов"
+// @Failure 400 {object} errorResponse "Неверные данные"
+// @Failure 404 {object} errorResponse "Логотипы не найдены"
+// @Failure 500 {object} errorResponse "Внутренняя ошибка сервера"
+// @Router /logos [get]
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
@@ -175,13 +150,8 @@ func (h *Handler) getLogo(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrLogoNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
 		return
 	}
 
