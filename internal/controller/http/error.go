@@ -11,6 +11,7 @@ import (
 type HttpSignalError interface {
 	error
 	Status() int
+	UnWrap() error
 }
 
 type errorResponse struct {
@@ -37,6 +38,10 @@ func (e *HttpError) Status() int {
 	return e.status
 }
 
+func (e *HttpError) UnWrap() error {
+	return e.error
+}
+
 var (
 	ErrInvalidID         = NewHttpError(errors.New("invalid id"), http.StatusBadRequest)
 	ErrEmptyAuthHeader   = NewHttpError(errors.New("authorization header is missing"), http.StatusUnauthorized)
@@ -51,7 +56,7 @@ var (
 func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSignalError) {
 	for _, sigerr := range signalErrors {
 
-		infrastructureErr := errors.Unwrap(sigerr)
+		infrastructureErr := sigerr.UnWrap()
 
 		if errors.Is(err, infrastructureErr) {
 			c.AbortWithStatusJSON(sigerr.Status(), errorResponse{infrastructureErr.Error()})
