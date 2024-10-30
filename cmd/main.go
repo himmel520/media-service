@@ -39,7 +39,7 @@ func main() {
 	}
 	defer db.Close()
 
-	rdb, err := redis.New(cfg.Cache.Conn)
+	rdb, err := redis.NewRedis(cfg.Cache.Conn)
 	if err != nil {
 		log.Fatalf("unable to connect to cache: %v", err)
 	}
