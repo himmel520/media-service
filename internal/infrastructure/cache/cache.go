@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"context"
 	"time"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
@@ -8,11 +9,13 @@ import (
 )
 
 //go:generate mockery --all
-type Cache struct {
-	Client *redis.Cache
+
+type Cache interface {
+	Set(ctx context.Context, key string, value any) error
+	Get(ctx context.Context, key string) (string, error)
+	Delete(ctx context.Context, prefix string) error
 }
 
-func New(db *goredis.Client, exp time.Duration) *Cache {
-	client := redis.NewClient(db, exp)
-	return &Cache{Client: client}
+func New(rdb *goredis.Client, exp time.Duration) Cache {
+	return redis.NewCache(rdb, exp)
 }

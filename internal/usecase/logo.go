@@ -2,11 +2,8 @@ package usecase
 
 import (
 	"context"
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"fmt"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
@@ -16,31 +13,54 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-const logoCachePrefix = "logo:*"
+const (
+	logoCachePrefix  = "logo:*"
+	allLogosCachekey = "logo:all"
+)
 
-type LogoCache interface {
-	Get(ctx context.Context, key string) (string, error)
-}
 type LogoUsecase struct {
 	repo  repository.LogoRepo
-	cache LogoCache
+	cache cache.Cache
 	log   *logrus.Logger
 }
 
-func NewLogoUsecase(repo repository.LogoRepo, cache *cache.Cache, log *logrus.Logger) *LogoUsecase {
-	return &LogoUsecase{repo: repo, cache: cache.Client, log: log}
+func NewLogoUsecase(repo repository.LogoRepo, cache cache.Cache, log *logrus.Logger) *LogoUsecase {
+	return &LogoUsecase{repo: repo, cache: cache, log: log}
+}
+
+func (uc *LogoUsecase) DeleteCache(ctx context.Context) {
+	if err := uc.cache.Delete(context.Background(), logoCachePrefix); err != nil {
+		uc.log.Error(err)
+	}
 }
 
 func (uc *LogoUsecase) Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error) {
-	return uc.repo.Add(ctx, logo)
+	logos, err := uc.repo.Add(ctx, logo)
+	if err != nil {
+		return nil, err
+	}
+
+	uc.DeleteCache(context.Background())
+	return logos, err
 }
 
 func (uc *LogoUsecase) Update(ctx context.Context, id int, logo *entity.LogoUpdate) (*entity.LogoResp, error) {
-	return uc.repo.Update(ctx, id, logo)
+	logos, err := uc.repo.Update(ctx, id, logo)
+	if err != nil {
+		return nil, err
+	}
+
+	uc.DeleteCache(context.Background())
+	return logos, err
 }
 
 func (uc *LogoUsecase) Delete(ctx context.Context, id int) error {
-	return uc.repo.Delete(ctx, id)
+	if err := uc.repo.Delete(ctx, id); err != nil {
+		return err
+	}
+
+	uc.DeleteCache(context.Background())
+	return nil
 }
 
 func (uc *LogoUsecase) GetByID(ctx context.Context, id int) (*entity.LogoResp, error) {
@@ -48,45 +68,43 @@ func (uc *LogoUsecase) GetByID(ctx context.Context, id int) (*entity.LogoResp, e
 }
 
 func (uc *LogoUsecase) GetAll(ctx context.Context) ([]*entity.LogoResp, error) {
-	return uc.repo.GetAll(ctx)
-}
+	var logos []*entity.LogoResp
 
-func (uc *LogoUsecase) GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.LogosResp, error) {
-	key := generateCacheKeyLogo(limit, offset)
-
-	val, err := uc.cache.Get(ctx, key)
-
-	if !errors.Is(err, errcache.ErrKeyNotFound) {
-		uc.log.Error(err)
-	}
-
-	logos := make(map[int]*entity.Logo)
-	err = json.Unmarshal([]byte(val), &logos)
+	logosStr, err := uc.cache.Get(ctx, allLogosCachekey)
 	if err != nil {
-		logos, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
+		if !errors.Is(err, errcache.ErrKeyNotFound) {
+			uc.log.Error(err)
+		}
+
+		logos, err = uc.repo.GetAll(ctx)
 		if err != nil {
 			return nil, err
 		}
-		return &entity.LogosResp{
-			Logos: logos,
-			Total: len(logos),
-		}, err
 
+		if err = uc.cache.Set(ctx, allLogosCachekey, logos); err != nil {
+			uc.log.Error(err)
+		}
+
+		return logos, nil
+	}
+
+	err = json.Unmarshal([]byte(logosStr), &logos)
+	return logos, err
+}
+
+func (uc *LogoUsecase) GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.LogosResp, error) {
+	logos, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+
+	count, err := uc.repo.Count(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	return &entity.LogosResp{
 		Logos: logos,
-		Total: len(logos),
+		Total: count,
 	}, err
-
-}
-
-func generateCacheKeyLogo(limit, offset int) string {
-	key := fmt.Sprintf("%d:%d", limit, offset)
-
-	hasher := md5.New()
-	hasher.Write([]byte(key))
-	hash := hex.EncodeToString(hasher.Sum(nil))
-
-	return advCachePrefix + hash
 }
