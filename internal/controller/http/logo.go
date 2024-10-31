@@ -28,7 +28,7 @@ func (h *Handler) addLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Add(c.Request.Context(), logo)
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoExist})
 		return
 	}
 
@@ -63,7 +63,7 @@ func (h *Handler) updateLogo(c *gin.Context) {
 
 	newLogo, err := h.uc.Logo.Update(c.Request.Context(), id, logo)
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist})
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *Handler) deleteLogo(c *gin.Context) {
 
 	err := h.uc.Logo.Delete(c.Request.Context(), id)
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoDependency})
 		return
 	}
 
@@ -111,7 +111,7 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 
 	logos, err := h.uc.Logo.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound})
 		return
 	}
 
@@ -130,7 +130,7 @@ func (h *Handler) getPaginatedLogos(c *gin.Context) {
 func (h *Handler) getLogos(c *gin.Context) {
 	logos, err := h.uc.Logo.GetAll(c.Request.Context())
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound})
 		return
 	}
 
@@ -151,7 +151,7 @@ func (h *Handler) getLogo(c *gin.Context) {
 
 	logo, err := h.uc.Logo.GetByID(c.Request.Context(), id)
 	if err != nil {
-		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound, ErrLogoExist, ErrLogoDependency})
+		checkHttpErr(h, c, err, []HttpSignalError{ErrLogoNotFound})
 		return
 	}
 

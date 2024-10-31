@@ -43,17 +43,6 @@ func (e *HttpError) UnWrap() error {
 	return e.error
 }
 
-var (
-	ErrInvalidID         = NewHttpError(controller.ErrInvalidID, http.StatusBadRequest)
-	ErrEmptyAuthHeader   = NewHttpError(controller.ErrEmptyAuthHeader, http.StatusUnauthorized)
-	ErrInvalidAuthHeader = NewHttpError(controller.ErrInvalidAuthHeader, http.StatusUnauthorized)
-	ErrForbidden         = NewHttpError(controller.ErrForbidden, http.StatusForbidden)
-
-	ErrLogoNotFound   = NewHttpError(repoerr.ErrLogoNotFound, http.StatusNotFound)
-	ErrLogoExist      = NewHttpError(repoerr.ErrLogoExist, http.StatusBadRequest)
-	ErrLogoDependency = NewHttpError(repoerr.ErrLogoDependency, http.StatusConflict)
-)
-
 func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSignalError) {
 	for _, sigerr := range signalErrors {
 
@@ -67,3 +56,38 @@ func checkHttpErr(h *Handler, c *gin.Context, err error, signalErrors []HttpSign
 	c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
 
 }
+
+// Middleware
+var (
+	ErrInvalidID         = NewHttpError(controller.ErrInvalidID, http.StatusBadRequest)
+	ErrEmptyAuthHeader   = NewHttpError(controller.ErrEmptyAuthHeader, http.StatusUnauthorized)
+	ErrInvalidAuthHeader = NewHttpError(controller.ErrInvalidAuthHeader, http.StatusUnauthorized)
+	ErrForbidden         = NewHttpError(controller.ErrForbidden, http.StatusForbidden)
+)
+
+// Logo
+var (
+	ErrLogoNotFound   = NewHttpError(repoerr.ErrLogoNotFound, http.StatusNotFound)
+	ErrLogoExist      = NewHttpError(repoerr.ErrLogoExist, http.StatusBadRequest)
+	ErrLogoDependency = NewHttpError(repoerr.ErrLogoDependency, http.StatusConflict)
+)
+
+// Adv
+var (
+	ErrAdvNotFound           = NewHttpError(repoerr.ErrAdvNotFound, http.StatusNotFound)
+	ErrAdvDependencyNotExist = NewHttpError(repoerr.ErrAdvDependencyNotExist, http.StatusConflict)
+)
+
+// Color
+var (
+	ErrColorNotFound        = NewHttpError(repoerr.ErrColorNotFound, http.StatusNotFound)
+	ErrColorHexExist        = NewHttpError(repoerr.ErrColorHexExist, http.StatusBadRequest)
+	ErrColorDependencyExist = NewHttpError(repoerr.ErrColorDependencyExist, http.StatusConflict)
+)
+
+// TG
+var (
+	ErrTGNotFound       = NewHttpError(repoerr.ErrTGNotFound, http.StatusNotFound)
+	ErrTGExist          = NewHttpError(repoerr.ErrTGExist, http.StatusBadRequest)
+	ErrTGDependencyExist = NewHttpError(repoerr.ErrTGDependencyExist, http.StatusConflict)
+)

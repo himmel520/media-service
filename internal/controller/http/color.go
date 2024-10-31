@@ -1,14 +1,12 @@
 package httpctrl
 
 import (
-	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
 )
 
 // @Summary Добавить новый цвет
@@ -29,16 +27,9 @@ func (h *Handler) addColor(c *gin.Context) {
 	}
 
 	newColor, err := h.uc.Color.Add(c.Request.Context(), color)
-	switch {
-	case errors.Is(err, repoerr.ErrColorHexExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrColorHexExist})
 		return
-
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
-		return
-
 	}
 
 	c.JSON(http.StatusCreated, newColor)
@@ -71,16 +62,8 @@ func (h *Handler) updateColor(c *gin.Context) {
 	}
 
 	newColor, err := h.uc.Color.Update(c.Request.Context(), id, color)
-	switch {
-	case errors.Is(err, repoerr.ErrColorHexExist):
-		c.AbortWithStatusJSON(http.StatusBadRequest, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrColorHexExist, ErrColorNotFound})
 		return
 	}
 
@@ -101,16 +84,8 @@ func (h *Handler) deleteColor(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 
 	err := h.uc.Color.Delete(c.Request.Context(), id)
-	switch {
-	case errors.Is(err, repoerr.ErrColorDependencyExist):
-		c.AbortWithStatusJSON(http.StatusConflict, errorResponse{err.Error()})
-		return
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrColorDependencyExist, ErrColorNotFound})
 		return
 	}
 
@@ -135,13 +110,8 @@ func (h *Handler) getColors(c *gin.Context) {
 	}
 
 	colors, err := h.uc.Color.GetAllWithPagination(c.Request.Context(), query.Limit, query.Offset)
-	switch {
-	case errors.Is(err, repoerr.ErrColorNotFound):
-		c.AbortWithStatusJSON(http.StatusNotFound, errorResponse{err.Error()})
-		return
-	case err != nil:
-		h.log.Error(err.Error())
-		c.AbortWithStatusJSON(http.StatusInternalServerError, errorResponse{err.Error()})
+	if err != nil {
+		checkHttpErr(h, c, err, []HttpSignalError{ErrColorNotFound})
 		return
 	}
 
