@@ -6,30 +6,29 @@ import (
 	"time"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
-	"github.com/redis/go-redis/v9"
+	goredis "github.com/redis/go-redis/v9"
 )
 
-type Cache struct {
-	rdb *redis.Client
-	exp time.Duration
-}
-
-func New(conn string) (*redis.Client, error) {
-	opt, err := redis.ParseURL(conn)
+func NewRedis(conn string) (*goredis.Client, error) {
+	opt, err := goredis.ParseURL(conn)
 	if err != nil {
 		return nil, err
 	}
 
-	rdb := redis.NewClient(opt)
+	rdb := goredis.NewClient(opt)
 
 	_, err = rdb.Ping(context.Background()).Result()
 
 	return rdb, err
 }
 
-func NewClient(db *redis.Client, exp time.Duration) *Cache {
-	return &Cache{rdb: db, exp: exp}
+type Cache struct {
+	rdb *goredis.Client
+	exp time.Duration
+}
 
+func NewCache(db *goredis.Client, exp time.Duration) *Cache {
+	return &Cache{rdb: db, exp: exp}
 }
 
 func (r *Cache) Set(ctx context.Context, key string, value any) error {
@@ -45,7 +44,7 @@ func (r *Cache) Set(ctx context.Context, key string, value any) error {
 func (r *Cache) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
-		if err == redis.Nil {
+		if err == goredis.Nil {
 			return "", errcache.ErrKeyNotFound
 		}
 		return "", err
