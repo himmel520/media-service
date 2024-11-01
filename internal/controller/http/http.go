@@ -24,6 +24,7 @@ func New(uc *usecase.Usecase, log *logrus.Logger) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
+	r.Use(h.newCors())
 
 	api := r.Group("/api/v1")
 	{
