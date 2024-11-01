@@ -28,15 +28,14 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := r.Group("/api/v1")
 	{
-		// Swagger
 		api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 		logo := api.Group("/logos")
 		{
-			logo.GET("/", h.getLogos) // get logos
+			logo.GET("/", h.getLogos)
 
 			logo.Use(h.validateID())
-			logo.GET("/:id", h.getLogo) // get logo by id
+			logo.GET("/:id", h.getLogo)
 		}
 
 		adv := api.Group("/ads")
@@ -49,12 +48,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			logo := admin.Group("/logos")
 			{
-				logo.GET("/", h.getPaginatedLogos) // get logos
-				logo.POST("/", h.addLogo)          // Add a new logo
+				logo.GET("/", h.getPaginatedLogos)
+				logo.POST("/", h.addLogo)
 
 				logo.Use(h.validateID())
-				logo.PUT("/:id", h.updateLogo)    // Update a logo
-				logo.DELETE("/:id", h.deleteLogo) // Delete a logo
+				logo.PUT("/:id", h.updateLogo)
+				logo.DELETE("/:id", h.deleteLogo)
 			}
 
 			colors := admin.Group("/colors", h.deleteCategoriesCache())

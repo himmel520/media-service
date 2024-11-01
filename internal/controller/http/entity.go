@@ -1,9 +1,5 @@
 package httpctrl
 
-type errorResponse struct {
-	Message string `json:"message"`
-}
-
 type PaginationQuery struct {
 	Limit  int `form:"limit,default=20" binding:"omitempty,min=1"`
 	Offset int `form:"offset,default=0" binding:"omitempty,min=0"`

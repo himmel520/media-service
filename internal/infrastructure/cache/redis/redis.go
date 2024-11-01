@@ -2,19 +2,69 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
+	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
+	goredis "github.com/redis/go-redis/v9"
 )
 
-func New(conn string) (*redis.Client, error) {
-	opt, err := redis.ParseURL(conn)
+func NewRedis(conn string) (*goredis.Client, error) {
+	opt, err := goredis.ParseURL(conn)
 	if err != nil {
 		return nil, err
 	}
 
-	rdb := redis.NewClient(opt)
+	rdb := goredis.NewClient(opt)
 
 	_, err = rdb.Ping(context.Background()).Result()
 
 	return rdb, err
+}
+
+type Cache struct {
+	rdb *goredis.Client
+	exp time.Duration
+}
+
+func NewCache(db *goredis.Client, exp time.Duration) *Cache {
+	return &Cache{rdb: db, exp: exp}
+}
+
+func (r *Cache) Set(ctx context.Context, key string, value any) error {
+	byte, err := json.Marshal(value)
+	if err != nil {
+		return err
+	}
+
+	_, err = r.rdb.Set(ctx, key, string(byte), r.exp).Result()
+	return err
+}
+
+func (r *Cache) Get(ctx context.Context, key string) (string, error) {
+	val, err := r.rdb.Get(ctx, key).Result()
+	if err != nil {
+		if err == goredis.Nil {
+			return "", errcache.ErrKeyNotFound
+		}
+		return "", err
+	}
+
+	return val, err
+}
+
+func (r *Cache) Delete(ctx context.Context, prefix string) error {
+	keys, err := r.rdb.Keys(ctx, prefix).Result()
+	if err != nil {
+		return err
+	}
+
+	for _, key := range keys {
+		err := r.rdb.Del(ctx, key).Err()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
