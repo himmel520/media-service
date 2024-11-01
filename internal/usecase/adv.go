@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
@@ -16,13 +17,15 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const advCachePrefix = "advs:*"
+
 type AdvUsecase struct {
 	repo  repository.AdvRepo
-	cache cache.AdvCache
+	cache cache.Cache
 	log   *logrus.Logger
 }
 
-func NewAdvUsecase(repo repository.AdvRepo, cache cache.AdvCache, log *logrus.Logger) *AdvUsecase {
+func NewAdvUsecase(repo repository.AdvRepo, cache cache.Cache, log *logrus.Logger) *AdvUsecase {
 	return &AdvUsecase{repo: repo, cache: cache, log: log}
 }
 
@@ -48,40 +51,41 @@ func (uc *AdvUsecase) Update(ctx context.Context, id int, adv *entity.AdvUpdate)
 }
 
 func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*entity.AdvResponse, error) {
-	key := uc.generateCacheKey(limit, offset, posts, priority)
+	key := generateCacheKeyAdv(limit, offset, posts, priority)
 
-	advs, err := uc.cache.Get(ctx, key)
+	advs := []*entity.AdvResponse{}
+	val, err := uc.cache.Get(ctx, key)
 	if err != nil {
 		if !errors.Is(err, errcache.ErrKeyNotFound) {
 			uc.log.Error(err)
 		}
 
-		// идем в бд
 		advs, err = uc.repo.GetAllWithFilter(ctx, limit, offset, posts, priority)
 		if err != nil {
 			return nil, err
 		}
 
-		// сохраняем в кэш
-		if err := uc.cache.Set(ctx, key, advs); err != nil {
+		if err = uc.cache.Set(context.Background(), key, advs); err != nil {
 			uc.log.Error(err)
 		}
-	}
 
-	return advs, nil
+		return advs, nil
+	}
+	
+	err = json.Unmarshal([]byte(val), &advs)
+	return advs, err
 }
 
 func (uc *AdvUsecase) DeleteCache(ctx context.Context) error {
-	return uc.cache.Delete(ctx)
+	return uc.cache.Delete(ctx, advCachePrefix)
 }
 
-func (uc *AdvUsecase) generateCacheKey(limit, offset int, posts, priority []string) string {
+func generateCacheKeyAdv(limit, offset int, posts, priority []string) string {
 	key := fmt.Sprintf("%d:%d:%s:%s", limit, offset, strings.Join(posts, ","), strings.Join(priority, ","))
 
-	// Создаем хеш
 	hasher := md5.New()
 	hasher.Write([]byte(key))
 	hash := hex.EncodeToString(hasher.Sum(nil))
 
-	return "advs:" + hash
+	return advCachePrefix + hash
 }

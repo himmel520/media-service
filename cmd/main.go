@@ -39,7 +39,7 @@ func main() {
 	}
 	defer db.Close()
 
-	rdb, err := redis.New(cfg.Cache.Conn)
+	rdb, err := redis.NewRedis(cfg.Cache.Conn)
 	if err != nil {
 		log.Fatalf("unable to connect to cache: %v", err)
 	}
@@ -51,8 +51,6 @@ func main() {
 
 	handler := httpctrl.New(usecase, log)
 
-
-	// сервер
 	app := server.New(handler.InitRoutes(), cfg.Srv.Addr)
 	go func() {
 		log.Infof("the server is starting on %v", cfg.Srv.Addr)
