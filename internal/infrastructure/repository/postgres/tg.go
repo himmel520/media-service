@@ -78,7 +78,7 @@ func (r *TGRepo) Delete(ctx context.Context, id int) error {
 	var pgErr *pgconn.PgError
 
 	cmdTag, err := r.DB.Exec(ctx, `
-	delete from TGs 
+	delete from tg 
 		where id = $1`, id)
 	if errors.As(err, &pgErr) {
 		if pgErr.Code == repoerr.FKViolation {
