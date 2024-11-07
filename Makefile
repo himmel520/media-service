@@ -3,7 +3,7 @@ deep:
 .PHONY: deep
 
 run:
-	docker compose -f docker/dev/dev.yml up --no-log-prefix --attach media
+	docker compose -f docker/dev/dev.yml up --build --no-log-prefix --attach media
 .PHONY: run
 
 prod:
