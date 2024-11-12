@@ -1,0 +1,23 @@
+type: object
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./image.yml"
+    example:
+      - id: 1
+        title: "Логотип компании"
+        url: "https://example.com/logo.png"
+        type: "logo"
+  page:
+    type: integer
+    description: Текущая страница
+    example: 0
+  pages:
+    type: integer
+    description: Количество страниц
+    example: 13
+  per_page:
+    type: integer
+    description: Количество записей на странице
+    example: 20

@@ -1,0 +1,13 @@
+type: object
+properties:
+  title:
+    type: string
+    description: Название ссылки
+    minLength: 3
+    maxLength: 100
+    example: "Golang"
+  url:
+    type: string
+    description: URL ссылки
+    format: uri
+    example: "https://example.com"

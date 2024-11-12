@@ -1,0 +1,46 @@
+get:
+  tags:
+    - ads
+  summary: Получить список реклам
+  description: Получает список всех реклам с фильтрацией по приоритету и должности
+  parameters:
+    - name: priority
+      in: query
+      description: Фильтр по приоритету
+      required: false
+      schema:
+        type: integer
+        enum: [1, 2, 3]
+    - name: post
+      in: query
+      description: Фильтр по должности (например, "Golang")
+      required: false
+      schema:
+        type: string
+  responses:
+    '200':
+      description: Список реклам успешно получен
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "../schemas/ads/ad.yml"
+    '400':
+      description: Ошибка в запросе (неверный формат данных или параметры)
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"
+    '404':
+      description: Реклама не найдена
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"

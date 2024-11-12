@@ -1,0 +1,101 @@
+put:
+  tags:
+    - images
+  summary: Обновить изображение по id
+  description: Обновляет данные изображения с указанным ID.
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: id изображения
+      required: true
+      schema:
+        type: integer
+        example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/images/imagePut.yml"
+  responses:
+    '200':
+      description: Изображение успешно обновлено
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/images/image.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Изображение с таким id не найдено
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Изображение с такой ссылкой и типом уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+delete:
+  tags:
+    - images
+  summary: Удалить изображение по id
+  description: Удаляет изображение с указанным ID
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: id изображения
+      required: true
+      schema:
+        type: integer
+        example: 1
+  responses:
+    '204':
+      description: Изображение успешно удалено
+    '404':
+      description: Изображение с таким id не найдено
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Нельзя удалить изображение, так как на него ссылается реклама
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

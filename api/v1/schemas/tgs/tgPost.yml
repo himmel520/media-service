@@ -1,0 +1,16 @@
+type: object
+properties:
+  title:
+    type: string
+    description: Название тг
+    minLength: 3
+    maxLength: 100
+    example: "Golang"
+  url:
+    type: string
+    description: URL тг
+    format: uri
+    example: "https://example.com"
+required:
+  - title
+  - url

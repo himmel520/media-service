@@ -1,0 +1,1300 @@
+openapi: 3.0.3
+info:
+  title: Uoffer Media API
+  description: media api
+  version: 1.0.0
+servers:
+  - description: local
+    url: /
+  - description: dev
+    url: /
+paths:
+  /v1/logos:
+    get:
+      tags:
+        - images
+      summary: Получить все логотипы
+      description: Возвращает список всех лого
+      responses:
+        '200':
+          description: Список лого успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/logosResp'
+        '400':
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Лого не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/ads:
+    get:
+      tags:
+        - ads
+      summary: Получить список реклам
+      description: Получает список всех реклам с фильтрацией по приоритету и должности
+      parameters:
+        - name: priority
+          in: query
+          description: Фильтр по приоритету
+          required: false
+          schema:
+            type: integer
+            enum:
+              - 1
+              - 2
+              - 3
+        - name: post
+          in: query
+          description: Фильтр по должности (например, "Golang")
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Список реклам успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ad'
+        '400':
+          description: Ошибка в запросе (неверный формат данных или параметры)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Реклама не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/ads:
+    get:
+      tags:
+        - ads
+      summary: Получить список реклам
+      description: Получает список всех реклам с пагинацией
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: per_page
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Список реклам успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/adsResp'
+        '400':
+          description: Ошибка в запросе (неверный формат данных или параметры)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Реклама не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      tags:
+        - ads
+      summary: Создать рекламу
+      description: Создает новую рекламу
+      security:
+        - adminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/adPost'
+      responses:
+        '201':
+          description: Реклама успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ad'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Конфликт данных, неверный id данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/ads/{id}:
+    put:
+      tags:
+        - ads
+      summary: Обновить рекламу
+      description: Обновляет рекламу по id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: id рекламы
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/adPut'
+      responses:
+        '200':
+          description: Реклама успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ad'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Реклама не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Конфликт данных, неверный id данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      tags:
+        - ads
+      summary: Удалить рекламу
+      description: Удаляет рекламу по id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор рекламы
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Реклама успешно удалена
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Реклама не найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/tgs:
+    get:
+      tags:
+        - tgs
+      summary: Получить список тг
+      description: Возвращает список  тг с возможностью пагинации
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: per_page
+          in: query
+          description: Количество тг на странице
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+      responses:
+        '200':
+          description: Список тг успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tgsResp'
+        '400':
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Тг не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      tags:
+        - tgs
+      summary: Добавить тг
+      description: Создает новый тг
+      security:
+        - adminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tgPost'
+      responses:
+        '201':
+          description: Тг успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tg'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Тг с такой ссылкой уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/tgs/{id}:
+    delete:
+      tags:
+        - tgs
+      summary: Удалить тг по id
+      description: Удаляет тг с указанным id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: id тг
+      responses:
+        '204':
+          description: Тг успешно удален
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Тг с таким id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Нельзя удалить тг, так как на него ссылается реклама
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      tags:
+        - tgs
+      summary: Обновить тг по id
+      description: Обновляет тг с указанным id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id тг
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/tgPut'
+      responses:
+        '200':
+          description: Тг успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tg'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Тг с таким id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Тг с такой ссылкой уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/colors:
+    get:
+      tags:
+        - colors
+      summary: Получить список цветов
+      description: Возвращает список цветов с возможностью пагинации
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: per_page
+          in: query
+          description: Количество цветов на странице
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+      responses:
+        '200':
+          description: Список цветов успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/colorsResp'
+        '400':
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Цвета не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      tags:
+        - colors
+      summary: Добавить цвет
+      description: Создает новый цвет
+      security:
+        - adminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/colorPost'
+      responses:
+        '201':
+          description: Цвет успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/color'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Цвет с таким hex уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/colors/{id}:
+    delete:
+      tags:
+        - colors
+      summary: Удалить цвет по id
+      description: Удаляет цвет с указанным id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+          description: id цвета
+      responses:
+        '204':
+          description: Цвет успешно удален
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Цвет с таким id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Нельзя удалить цвет, так как на него ссылается реклама
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    put:
+      tags:
+        - colors
+      summary: Обновить цвет по id
+      description: Обновляет цвет с указанным id
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id цвета
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/colorPut'
+      responses:
+        '200':
+          description: Цвет успешно обновлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/color'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Цвет с таким id не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Цвет с таким hex уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/images:
+    get:
+      tags:
+        - images
+      summary: Получить список изображений
+      description: Возвращает список изображений с поддержкой пагинации
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: Номер страницы для пагинации
+          required: false
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+        - name: per_page
+          in: query
+          description: Количество элементов на странице
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+      responses:
+        '200':
+          description: Список изображений успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imagesResp'
+        '400':
+          description: Некорректные параметры запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Изображения не найдены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    post:
+      tags:
+        - images
+      summary: Добавить новое изображение
+      description: Создает новый элемент изображения
+      security:
+        - adminBearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imagePost'
+      responses:
+        '201':
+          description: Изображение успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/image'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Изображение с такой ссылкой и типом уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/admin/images/{id}:
+    put:
+      tags:
+        - images
+      summary: Обновить изображение по id
+      description: Обновляет данные изображения с указанным ID.
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id изображения
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imagePut'
+      responses:
+        '200':
+          description: Изображение успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/image'
+        '400':
+          description: Некорректные данные
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Изображение с таким id не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Изображение с такой ссылкой и типом уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+    delete:
+      tags:
+        - images
+      summary: Удалить изображение по id
+      description: Удаляет изображение с указанным ID
+      security:
+        - adminBearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: id изображения
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '204':
+          description: Изображение успешно удалено
+        '401':
+          description: Неавторизованный доступ
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '404':
+          description: Изображение с таким id не найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        '409':
+          description: Нельзя удалить изображение, так как на него ссылается реклама
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+        default:
+          description: Неизвестная ошибка
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+components:
+  securitySchemes:
+    adminBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for admin authentication
+    userBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for user authentication
+  schemas:
+    error:
+      type: object
+      required:
+        - message
+        - details
+      properties:
+        message:
+          type: string
+          description: error message
+          example: Invalid
+        details:
+          type: object
+          additionalProperties: true
+    image:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор изображения
+          example: 1
+        title:
+          type: string
+          description: Название изображения
+          example: Логотип компании
+        url:
+          type: string
+          description: URL изображения
+          format: uri
+          example: https://example.com/logo.png
+        type:
+          type: string
+          description: Тип изображения (например, 'adv' или 'logo')
+          enum:
+            - adv
+            - logo
+    logosResp:
+      type: array
+      items:
+        $ref: '#/components/schemas/image'
+      example:
+        - id: 1
+          title: Логотип компании
+          url: https://example.com/logo.png
+          type: logo
+    color:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор цвета
+          example: 1
+        title:
+          type: string
+          description: Название цвета
+          example: Красный
+        hex:
+          type: string
+          description: HEX код цвета
+          example: '#FF0000'
+    tg:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор тг
+          example: 1
+        title:
+          type: string
+          description: Название тг
+          example: Golang
+        url:
+          type: string
+          description: URL тг
+          format: uri
+          example: https://example.com
+    ad:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор рекламы
+          example: 1
+        image:
+          $ref: '#/components/schemas/image'
+        color:
+          $ref: '#/components/schemas/color'
+        tg:
+          $ref: '#/components/schemas/tg'
+        post:
+          type: string
+          description: Должность, связанная с рекламой
+          example: Менеджер
+        title:
+          type: string
+          description: Заголовок рекламы
+          example: Реклама продукта X
+        description:
+          type: string
+          description: Описание рекламы
+          example: Подробное описание рекламы
+        priority:
+          type: integer
+          description: Приоритет рекламы
+          enum:
+            - 1
+            - 2
+            - 3
+          example: 2
+    adsResp:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ad'
+        page:
+          type: integer
+          description: Текущая страница
+          example: 0
+        pages:
+          type: integer
+          description: Количество страниц
+          example: 13
+        per_page:
+          type: integer
+          description: Количество записей на странице
+          example: 1
+    adPost:
+      type: object
+      properties:
+        post:
+          type: string
+          description: Должность, связанная с рекламой
+          minLength: 3
+          maxLength: 100
+          example: Менеджер
+        images_id:
+          type: integer
+          description: Идентификатор изображения
+          min: 1
+          example: 1
+        colors_id:
+          type: integer
+          description: Идентификатор цвета
+          min: 1
+          example: 3
+        tg_id:
+          type: integer
+          description: Идентификатор тега
+          min: 1
+          example: 2
+        title:
+          type: string
+          description: Заголовок рекламы
+          minLength: 3
+          maxLength: 40
+          example: Реклама продукта X
+        description:
+          type: string
+          description: Описание рекламы
+          minLength: 5
+          maxLength: 150
+          example: Подробное описание рекламы
+        priority:
+          type: integer
+          description: Приоритет рекламы
+          enum:
+            - 1
+            - 2
+            - 3
+          example: 2
+      required:
+        - post
+        - title
+        - description
+        - priority
+        - images_id
+        - colors_id
+        - tg_id
+    adPut:
+      type: object
+      properties:
+        post:
+          type: string
+          description: Должность, связанная с рекламой
+          minLength: 3
+          maxLength: 100
+          example: Менеджер
+        images_id:
+          type: integer
+          description: Идентификатор изображения
+          min: 1
+          example: 1
+        colors_id:
+          type: integer
+          description: Идентификатор цвета
+          min: 1
+          example: 3
+        tg_id:
+          type: integer
+          description: Идентификатор тега
+          min: 1
+          example: 2
+        title:
+          type: string
+          description: Заголовок рекламы
+          minLength: 3
+          maxLength: 40
+          example: Реклама продукта X
+        description:
+          type: string
+          description: Описание рекламы
+          minLength: 5
+          maxLength: 150
+          example: Подробное описание рекламы
+        priority:
+          type: integer
+          description: Приоритет рекламы
+          enum:
+            - 1
+            - 2
+            - 3
+          example: 2
+    tgsResp:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/tg'
+          example:
+            - id: 1
+              title: Golang
+              url: https://example.com
+        page:
+          type: integer
+          description: Текущая страница
+          example: 0
+        pages:
+          type: integer
+          description: Количество страниц
+          example: 13
+        per_page:
+          type: integer
+          description: Количество записей на странице
+          example: 1
+    tgPost:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название тг
+          minLength: 3
+          maxLength: 100
+          example: Golang
+        url:
+          type: string
+          description: URL тг
+          format: uri
+          example: https://example.com
+      required:
+        - title
+        - url
+    tgPut:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название ссылки
+          minLength: 3
+          maxLength: 100
+          example: Golang
+        url:
+          type: string
+          description: URL ссылки
+          format: uri
+          example: https://example.com
+    colorsResp:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/color'
+          example:
+            - id: 1
+              title: Красный
+              hex: '#FF0000'
+        page:
+          type: integer
+          description: Текущая страница
+          example: 0
+        pages:
+          type: integer
+          description: Количество страниц
+          example: 13
+        per_page:
+          type: integer
+          description: Количество записей на странице
+          example: 1
+    colorPost:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название цвета
+          minLength: 3
+          maxLength: 100
+          example: Красный
+        hex:
+          type: string
+          description: HEX код цвета
+          pattern: ^#[0-9A-Fa-f]{6}$
+          example: '#FF0000'
+      required:
+        - title
+        - hex
+    colorPut:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название цвета
+          minLength: 3
+          maxLength: 100
+          example: Красный
+        hex:
+          type: string
+          description: HEX код цвета
+          pattern: ^#[0-9A-Fa-f]{6}$
+          example: '#FF0000'
+    imagesResp:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/image'
+          example:
+            - id: 1
+              title: Логотип компании
+              url: https://example.com/logo.png
+              type: logo
+        page:
+          type: integer
+          description: Текущая страница
+          example: 0
+        pages:
+          type: integer
+          description: Количество страниц
+          example: 13
+        per_page:
+          type: integer
+          description: Количество записей на странице
+          example: 20
+    imagePost:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название изображения
+          minLength: 3
+          maxLength: 100
+          example: Логотип компании
+        url:
+          type: string
+          description: URL изображения
+          format: uri
+          example: https://example.com/logo.png
+        type:
+          type: string
+          description: Тип изображения (например, 'adv' или 'logo')
+          enum:
+            - adv
+            - logo
+      required:
+        - title
+        - url
+        - type
+    imagePut:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Название изображения
+          minLength: 3
+          maxLength: 100
+          example: Обновленный логотип
+        url:
+          type: string
+          description: URL изображения
+          format: uri
+          example: https://example.com/new_logo.png
+        type:
+          type: string
+          description: Тип изображения (например, 'adv' или 'logo')
+          enum:
+            - adv
+            - logo

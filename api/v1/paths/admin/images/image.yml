@@ -1,0 +1,100 @@
+get:
+  tags:
+    - images
+  summary: Получить список изображений
+  description: Возвращает список изображений с поддержкой пагинации
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      description: Номер страницы для пагинации
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    - name: per_page
+      in: query
+      description: Количество элементов на странице
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+  responses:
+    '200':
+      description: Список изображений успешно получен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/images/imagesResp.yml"
+    '400':
+      description: Некорректные параметры запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Изображения не найдены
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+post:
+  tags:
+    - images
+  summary: Добавить новое изображение
+  description: Создает новый элемент изображения
+  security:
+    - adminBearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/images/imagePost.yml"
+  responses:
+    '201':
+      description: Изображение успешно добавлено
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/images/image.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Изображение с такой ссылкой и типом уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

@@ -1,0 +1,30 @@
+get:
+  tags:
+    - images
+  summary: Получить все логотипы
+  description: Возвращает список всех лого
+  responses:
+    '200':
+      description: Список лого успешно получен
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/images/logosResp.yml"
+    '400':
+      description: Некорректные параметры запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"
+    '404':
+      description: Лого не найдены
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../schemas/error.yml"
