@@ -47,7 +47,7 @@ migrate.up:
 .PHONY: migrate.down
 migrate.down:
 	docker run --rm \
-		--network question_default \
+		--network media_default \
 		-v `pwd`/migrations:/migrations \
 		migrate/migrate \
 		-path=/migrations -database $(POSTGRES_CONN) down -all

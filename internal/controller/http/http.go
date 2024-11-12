@@ -2,12 +2,12 @@ package httpctrl
 
 import (
 	"github.com/gin-gonic/gin"
-	_ "github.com/himmel520/uoffer/mediaAd/docs"
+	// _ "github.com/himmel520/uoffer/mediaAd/docs"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 
 	"github.com/sirupsen/logrus"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	// swaggerFiles "github.com/swaggo/files"
+	// ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 type Handler struct {
@@ -28,7 +28,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	api := r.Group("/api/v1")
 	{
-		api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		// api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 		logo := api.Group("/logos")
 		{

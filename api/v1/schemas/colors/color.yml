@@ -1,0 +1,14 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Идентификатор цвета
+    example: 1
+  title:
+    type: string
+    description: Название цвета
+    example: "Красный"
+  hex:
+    type: string
+    description: HEX код цвета
+    example: "#FF0000"

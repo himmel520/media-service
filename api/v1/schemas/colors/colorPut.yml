@@ -1,0 +1,13 @@
+type: object
+properties:
+  title:
+    type: string
+    description: Название цвета
+    minLength: 3
+    maxLength: 100
+    example: "Красный"
+  hex:
+    type: string
+    description: HEX код цвета
+    pattern: "^#[0-9A-Fa-f]{6}$" 
+    example: "#FF0000"

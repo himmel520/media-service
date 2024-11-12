@@ -1,0 +1,48 @@
+type: object
+properties:
+  post:
+    type: string
+    description: Должность, связанная с рекламой
+    minLength: 3
+    maxLength: 100
+    example: "Менеджер"
+  images_id:
+    type: integer
+    description: Идентификатор изображения
+    min: 1
+    example: 1
+  colors_id:
+    type: integer
+    description: Идентификатор цвета
+    min: 1
+    example: 3
+  tg_id:
+    type: integer
+    description: Идентификатор тега
+    min: 1
+    example: 2
+  title:
+    type: string
+    description: Заголовок рекламы
+    minLength: 3
+    maxLength: 40
+    example: "Реклама продукта X"
+  description:
+    type: string
+    description: Описание рекламы
+    minLength: 5
+    maxLength: 150
+    example: "Подробное описание рекламы"
+  priority:
+    type: integer
+    description: Приоритет рекламы
+    enum: [1, 2, 3]
+    example: 2
+required:
+  - post
+  - title
+  - description
+  - priority
+  - images_id
+  - colors_id
+  - tg_id

@@ -5,19 +5,45 @@ servers:
   - description: dev
     url: /
 info:
-  title: Uoffer Question API
-  description: question api
+  title: Uoffer Media API
+  description: media api
   version: 1.0.0
 
 paths:
-  # /v1/admin/categories:
-  #   $ref: "./v1/paths/admin/category/category.yml"   
-  # /v1/admin/categories/{id}:     
-  #   $ref: "./v1/paths/admin/category/category_id.yml"  
+  /v1/logos:
+    $ref: "./v1/paths/logos.yml"
+  /v1/ads:
+    $ref: "./v1/paths/ads.yml"
+
+  /v1/admin/ads:
+    $ref: "./v1/paths/admin/ads/ad.yml"   
+  /v1/admin/ads/{id}:     
+    $ref: "./v1/paths/admin/ads/ad_id.yml"  
+
+  /v1/admin/tgs:
+    $ref: "./v1/paths/admin/tgs/tg.yml"   
+  /v1/admin/tgs/{id}:     
+    $ref: "./v1/paths/admin/tgs/tg_id.yml"  
+
+  /v1/admin/colors:
+    $ref: "./v1/paths/admin/colors/color.yml"
+  /v1/admin/colors/{id}:
+    $ref: "./v1/paths/admin/colors/color_id.yml"
+
+  /v1/admin/images:
+    $ref: "./v1/paths/admin/images/image.yml"
+  /v1/admin/images/{id}:
+    $ref: "./v1/paths/admin/images/image_id.yml"
 
 components:
-  securitySchemes:
-    bearerAuth:
+   securitySchemes:
+    adminBearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: JWT token for admin authentication
+    userBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token for user authentication

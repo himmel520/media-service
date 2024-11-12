@@ -1,0 +1,19 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Идентификатор изображения
+    example: 1
+  title:
+    type: string
+    description: Название изображения
+    example: "Логотип компании"
+  url:
+    type: string
+    description: URL изображения
+    format: uri
+    example: "https://example.com/logo.png"
+  type:
+    type: string
+    description: Тип изображения (например, 'adv' или 'logo')
+    enum: [adv, logo]

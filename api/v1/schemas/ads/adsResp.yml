@@ -1,0 +1,19 @@
+type: object
+properties:
+  data:
+    type: array
+    items:
+      $ref: "./ad.yml"
+  page:
+    type: integer
+    description: Текущая страница
+    example: 0
+  pages:
+    type: integer
+    description: Количество страниц
+    example: 13
+  per_page:
+    type: integer
+    description: Количество записей на странице
+    example: 1
+

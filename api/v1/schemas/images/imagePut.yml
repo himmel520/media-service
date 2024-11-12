@@ -1,0 +1,17 @@
+type: object
+properties:
+  title:
+    type: string
+    description: Название изображения
+    minLength: 3
+    maxLength: 100
+    example: "Обновленный логотип"
+  url:
+    type: string
+    description: URL изображения
+    format: uri
+    example: "https://example.com/new_logo.png"
+  type:
+    type: string
+    description: Тип изображения (например, 'adv' или 'logo')
+    enum: [adv, logo]
