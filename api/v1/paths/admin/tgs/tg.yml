@@ -1,0 +1,100 @@
+get:
+  tags:
+    - tgs
+  summary: Получить список тг
+  description: Возвращает список  тг с возможностью пагинации
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      description: Номер страницы для пагинации
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    - name: per_page
+      in: query
+      description: Количество тг на странице
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+  responses:
+    '200':
+      description: Список тг успешно получен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/tgs/tgsResp.yml"
+    '400':
+      description: Некорректные параметры запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Тг не найдены
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+post:
+  tags:
+    - tgs
+  summary: Добавить тг
+  description: Создает новый тг
+  security:
+    - adminBearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/tgs/tgPost.yml"
+  responses:
+    '201':
+      description: Тг успешно добавлен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/tgs/tg.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Тг с такой ссылкой уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

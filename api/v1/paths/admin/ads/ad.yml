@@ -1,0 +1,98 @@
+get:
+  tags:
+    - ads
+  summary: Получить список реклам
+  description: Получает список всех реклам с пагинацией
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      description: Номер страницы для пагинации
+      required: false
+      schema:
+        type: integer
+        default: 1
+    - name: per_page
+      in: query
+      description: Количество элементов на странице
+      required: false
+      schema:
+        type: integer
+        default: 20
+  responses:
+    '200':
+      description: Список реклам успешно получен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/ads/adsResp.yml"
+    '400':
+      description: Ошибка в запросе (неверный формат данных или параметры)
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Реклама не найдена
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+post:
+  tags:
+    - ads
+  summary: Создать рекламу
+  description: Создает новую рекламу
+  security:
+    - adminBearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/ads/adPost.yml"
+  responses:
+    '201':
+      description: Реклама успешно создана
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/ads/ad.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Конфликт данных, неверный id данных
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

@@ -1,0 +1,29 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Идентификатор рекламы
+    example: 1
+  image:
+     $ref: "../images/image.yml"
+  color:
+     $ref: "../colors/color.yml"
+  tg:
+    $ref: "../tgs/tg.yml"
+  post:
+    type: string
+    description: Должность, связанная с рекламой
+    example: "Менеджер"
+  title:
+    type: string
+    description: Заголовок рекламы
+    example: "Реклама продукта X"
+  description:
+    type: string
+    description: Описание рекламы
+    example: "Подробное описание рекламы"
+  priority:
+    type: integer
+    description: Приоритет рекламы
+    enum: [1, 2, 3]
+    example: 2

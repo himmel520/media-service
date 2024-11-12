@@ -1,0 +1,15 @@
+type: object
+properties:
+  id:
+    type: integer
+    description: Идентификатор тг
+    example: 1
+  title:
+    type: string
+    description: Название тг
+    example: "Golang"
+  url:
+    type: string
+    description: URL тг
+    format: uri
+    example: "https://example.com"

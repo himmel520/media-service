@@ -1,0 +1,100 @@
+get:
+  tags:
+    - colors
+  summary: Получить список цветов
+  description: Возвращает список цветов с возможностью пагинации
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: page
+      in: query
+      description: Номер страницы для пагинации
+      required: false
+      schema:
+        type: integer
+        default: 0
+        minimum: 0
+    - name: per_page
+      in: query
+      description: Количество цветов на странице
+      required: false
+      schema:
+        type: integer
+        default: 20
+        minimum: 1
+  responses:
+    '200':
+      description: Список цветов успешно получен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/colors/colorsResp.yml"
+    '400':
+      description: Некорректные параметры запроса
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Цвета не найдены
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+post:
+  tags:
+    - colors
+  summary: Добавить цвет
+  description: Создает новый цвет
+  security:
+    - adminBearerAuth: []
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/colors/colorPost.yml"
+  responses:
+    '201':
+      description: Цвет успешно добавлен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/colors/color.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Цвет с таким hex уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

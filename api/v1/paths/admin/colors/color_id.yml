@@ -1,0 +1,101 @@
+delete:
+  tags:
+    - colors
+  summary: Удалить цвет по id
+  description: Удаляет цвет с указанным id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+      description: id цвета
+  responses:
+    '204':
+      description: Цвет успешно удален
+    '404':
+      description: Цвет с таким id не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Нельзя удалить цвет, так как на него ссылается реклама
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+put:
+  tags:
+    - colors
+  summary: Обновить цвет по id
+  description: Обновляет цвет с указанным id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: id цвета
+      required: true
+      schema:
+        type: integer
+        example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/colors/colorPut.yml"
+  responses:
+    '200':
+      description: Цвет успешно обновлен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/colors/color.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Цвет с таким id не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Цвет с таким hex уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

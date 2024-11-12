@@ -1,0 +1,95 @@
+put:
+  tags:
+    - ads
+  summary: Обновить рекламу
+  description: Обновляет рекламу по id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: id рекламы
+      schema:
+        type: integer
+        example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/ads/adPut.yml"
+  responses:
+    '200':
+      description: Реклама успешно обновлена
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/ads/ad.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Реклама не найдена
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Конфликт данных, неверный id данных
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+delete:
+  tags:
+    - ads
+  summary: Удалить рекламу
+  description: Удаляет рекламу по id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      description: Идентификатор рекламы
+      schema:
+        type: integer
+        example: 1
+  responses:
+    '204':
+      description: Реклама успешно удалена
+    '404':
+      description: Реклама не найдена
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"

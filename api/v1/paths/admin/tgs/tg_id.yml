@@ -1,0 +1,101 @@
+delete:
+  tags:
+    - tgs
+  summary: Удалить тг по id
+  description: Удаляет тг с указанным id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+        example: 1
+      description: id тг
+  responses:
+    '204':
+      description: Тг успешно удален
+    '404':
+      description: Тг с таким id не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Нельзя удалить тг, так как на него ссылается реклама
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+
+put:
+  tags:
+    - tgs
+  summary: Обновить тг по id
+  description: Обновляет тг с указанным id
+  security:
+    - adminBearerAuth: []
+  parameters:
+    - name: id
+      in: path
+      description: id тг
+      required: true
+      schema:
+        type: integer
+        example: 1
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../../../schemas/tgs/tgPut.yml"
+  responses:
+    '200':
+      description: Тг успешно обновлен
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/tgs/tg.yml"
+    '400':
+      description: Некорректные данные
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '404':
+      description: Тг с таким id не найден
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '409':
+      description: Тг с такой ссылкой уже существует
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    '401':
+      description: Неавторизованный доступ
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
+    default:
+      description: Неизвестная ошибка
+      content:
+        application/json:
+          schema:
+            $ref: "../../../schemas/error.yml"
