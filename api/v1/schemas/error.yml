@@ -1,0 +1,12 @@
+type: object
+required:
+  - message
+  - details
+properties:
+  message:
+    type: string
+    description: error message
+    example: "Invalid"
+  details:
+    type: object
+    additionalProperties: true

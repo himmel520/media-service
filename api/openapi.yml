@@ -1,0 +1,23 @@
+openapi: 3.0.3
+servers:
+  - description: local
+    url: /
+  - description: dev
+    url: /
+info:
+  title: Uoffer Question API
+  description: question api
+  version: 1.0.0
+
+paths:
+  # /v1/admin/categories:
+  #   $ref: "./v1/paths/admin/category/category.yml"   
+  # /v1/admin/categories/{id}:     
+  #   $ref: "./v1/paths/admin/category/category_id.yml"  
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
