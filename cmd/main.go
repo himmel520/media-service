@@ -9,13 +9,11 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/himmel520/uoffer/mediaAd/config"
-	"github.com/himmel520/uoffer/mediaAd/pkg/logger"
-
-	"github.com/himmel520/uoffer/mediaAd/internal/controller/ogen"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller/ogen/auth"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/postgres"
+	"github.com/himmel520/media-service/config"
+	"github.com/himmel520/media-service/internal/controller/ogen"
+	"github.com/himmel520/media-service/internal/infrastructure/cache/redis"
+	"github.com/himmel520/media-service/internal/infrastructure/repository/postgres"
+	"github.com/himmel520/media-service/pkg/logger"
 )
 
 // @title API Documentation

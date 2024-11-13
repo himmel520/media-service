@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/controller"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/repoerr"
+	"github.com/himmel520/media-service/internal/controller"
+	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
 )
 
 type HttpSignalError interface {
@@ -87,7 +87,7 @@ var (
 
 // TG
 var (
-	ErrTGNotFound       = NewHttpError(repoerr.ErrTGNotFound, http.StatusNotFound)
-	ErrTGExist          = NewHttpError(repoerr.ErrTGExist, http.StatusBadRequest)
+	ErrTGNotFound        = NewHttpError(repoerr.ErrTGNotFound, http.StatusNotFound)
+	ErrTGExist           = NewHttpError(repoerr.ErrTGExist, http.StatusBadRequest)
 	ErrTGDependencyExist = NewHttpError(repoerr.ErrTGDependencyExist, http.StatusConflict)
 )

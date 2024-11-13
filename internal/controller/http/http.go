@@ -2,8 +2,8 @@ package httpctrl
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/himmel520/media-service/internal/usecase"
 	// _ "github.com/himmel520/uoffer/mediaAd/docs"
-	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 
 	"github.com/sirupsen/logrus"
 	// swaggerFiles "github.com/swaggo/files"

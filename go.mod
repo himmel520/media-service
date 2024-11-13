@@ -1,4 +1,4 @@
-module github.com/himmel520/uoffer/mediaAd
+module github.com/himmel520/media-service
 
 go 1.22.3
 

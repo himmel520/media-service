@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
+	"github.com/himmel520/media-service/internal/entity"
 )
 
 type AuthUsecase struct {

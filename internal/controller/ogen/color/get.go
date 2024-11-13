@@ -3,7 +3,7 @@ package color
 import (
 	"context"
 
-	api "github.com/himmel520/uoffer/mediaAd/api/oas"
+	api "github.com/himmel520/media-service/api/oas"
 )
 
 func (h *Handler) V1LogosGet(ctx context.Context) (api.V1LogosGetRes, error) {

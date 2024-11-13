@@ -3,7 +3,7 @@ package img
 import (
 	"context"
 
-	api "github.com/himmel520/uoffer/mediaAd/api/oas"
+	api "github.com/himmel520/media-service/api/oas"
 )
 
 func (h *Handler) V1AdminImagesGet(ctx context.Context, params api.V1AdminImagesGetParams) (api.V1AdminImagesGetRes, error) {

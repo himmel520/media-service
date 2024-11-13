@@ -3,7 +3,7 @@ package ogen
 import (
 	"context"
 
-	api "github.com/himmel520/uoffer/mediaAd/api/oas"
+	api "github.com/himmel520/media-service/api/oas"
 )
 
 type (
@@ -66,11 +66,11 @@ type HandlerParams struct {
 
 func NewHandler(params HandlerParams) *Handler {
 	return &Handler{
-		Auth: params.Auth,
+		Auth:  params.Auth,
 		Error: params.Error,
-		Ad: params.Ad,
+		Ad:    params.Ad,
 		Color: params.Color,
 		Image: params.Image,
-		Tg: params.Tg,
+		Tg:    params.Tg,
 	}
 }

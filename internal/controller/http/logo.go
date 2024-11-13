@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
+	"github.com/himmel520/media-service/internal/entity"
 )
 
 // @Summary Добавить новый логотип

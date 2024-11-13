@@ -3,7 +3,7 @@ package ad
 import (
 	"context"
 
-	api "github.com/himmel520/uoffer/mediaAd/api/oas"
+	api "github.com/himmel520/media-service/api/oas"
 )
 
 func (h *Handler) V1AdsGet(ctx context.Context, params api.V1AdsGetParams) (api.V1AdsGetRes, error) {

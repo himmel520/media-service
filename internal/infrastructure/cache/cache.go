@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
+	"github.com/himmel520/media-service/internal/infrastructure/cache/redis"
 	goredis "github.com/redis/go-redis/v9"
 )
 

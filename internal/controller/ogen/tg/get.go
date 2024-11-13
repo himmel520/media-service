@@ -3,7 +3,7 @@ package tg
 import (
 	"context"
 
-	api "github.com/himmel520/uoffer/mediaAd/api/oas"
+	api "github.com/himmel520/media-service/api/oas"
 )
 
 func (h *Handler) V1AdminTgsGet(ctx context.Context, params api.V1AdminTgsGetParams) (api.V1AdminTgsGetRes, error) {

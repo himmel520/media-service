@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
-
+	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
+	"github.com/himmel520/media-service/internal/infrastructure/cache/errcache"
+	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/sirupsen/logrus"
 )
 
