@@ -15,9 +15,20 @@ import (
 	errHandler "github.com/himmel520/media-service/internal/controller/ogen/error"
 	imgHandler "github.com/himmel520/media-service/internal/controller/ogen/img"
 	tgHandler "github.com/himmel520/media-service/internal/controller/ogen/tg"
+	adUC "github.com/himmel520/media-service/internal/usecase/ad"
+	authUC "github.com/himmel520/media-service/internal/usecase/auth"
+	colorUC "github.com/himmel520/media-service/internal/usecase/color"
+	imgUC "github.com/himmel520/media-service/internal/usecase/img"
+	tgUC "github.com/himmel520/media-service/internal/usecase/tg"
 
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
 	"github.com/himmel520/media-service/internal/infrastructure/cache/redis"
+	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/postgres"
+	adRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/ad"
+	colorRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/color"
+	imgRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/img"
+	tgRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/tg"
 	"github.com/himmel520/media-service/pkg/logger"
 )
 
@@ -40,11 +51,12 @@ func main() {
 	}
 
 	// db
-	db, err := postgres.NewPG(cfg.DB.DBConn)
+	pool, err := postgres.NewPG(cfg.DB.DBConn)
 	if err != nil {
 		log.Fatalf("unable to connect to pool: %v", err)
 	}
-	defer db.Close()
+	defer pool.Close()
+	dbtx := repository.NewDBTX(pool)
 
 	// cache
 	rdb, err := redis.NewRedis(cfg.Cache.Conn)
@@ -53,17 +65,30 @@ func main() {
 	}
 	defer rdb.Close()
 
-	// cache := cache.New(rdb, cfg.Cache.Exp)
+	cache := cache.New(rdb, cfg.Cache.Exp)
 	// repo := repository.New(db)
-	// usecase := usecase.New(repo, cache, cfg.Srv.JWT.PublicKey, log)
+	// usecase := usecase.New(repo, cache, , log)
+
+	// repo
+	tgRepo := tgRepo.New()
+	colorRepo := colorRepo.New()
+	imgRepo := imgRepo.New()
+	adRepo := adRepo.New()
+
+	// uc
+	authUC := authUC.New(cfg.Srv.JWT.PublicKey, log)
+	tgUC := tgUC.New(dbtx, tgRepo, log)
+	colorUC := colorUC.New(dbtx, colorRepo, log)
+	imgUC := imgUC.New(dbtx, imgRepo, cache, log)
+	adUC := adUC.New(dbtx, adRepo, cache, log)
 
 	handler := ogen.NewHandler(ogen.HandlerParams{
-		Auth:  authHandler.New(log),
+		Auth:  authHandler.New(authUC, log),
 		Error: errHandler.New(),
-		Ad:    adHandler.New(nil, log),
-		Color: colorHandler.New(nil, log),
-		Image: imgHandler.New(nil, log),
-		Tg:    tgHandler.New(nil, log),
+		Ad:    adHandler.New(adUC, log),
+		Color: colorHandler.New(colorUC, log),
+		Image: imgHandler.New(imgUC, log),
+		Tg:    tgHandler.New(tgUC, log),
 	})
 
 	app, err := ogen.NewServer(handler, cfg.Srv.Addr)

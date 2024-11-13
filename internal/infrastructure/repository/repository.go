@@ -2,60 +2,58 @@ package repository
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
-	"github.com/himmel520/media-service/internal/entity"
-	"github.com/himmel520/media-service/internal/infrastructure/repository/postgres"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
+
+// TODO: убрать зависимость интерфейса от pgx
 
 type (
-	Repository struct {
-		AdvRepo
-		ColorRepo
-		LogoRepo
-		TGRepo
+	DBTX struct {
+		qe Querier
 	}
 
-	AdvRepo interface {
-		Add(ctx context.Context, adv *entity.Adv) (int, error)
-		GetByID(ctx context.Context, id int) (*entity.AdvResponse, error)
-		Delete(ctx context.Context, id int) error
-		Update(ctx context.Context, id int, adv *entity.AdvUpdate) error
-		GetAllWithFilter(ctx context.Context, limit, offset int, posts []string, priority []string) ([]*entity.AdvResponse, error)
+	Querier interface {
+		Begin(ctx context.Context) (pgx.Tx, error)
+		Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+		Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+		QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 	}
 
-	ColorRepo interface {
-		Add(ctx context.Context, color *entity.Color) (*entity.ColorResp, error)
-		Update(ctx context.Context, id int, Color *entity.ColorUpdate) (*entity.ColorResp, error)
-		Delete(ctx context.Context, id int) error
-		GetAllWithPagination(ctx context.Context, limit, offset int) ([]*entity.ColorResp, error)
-		Count(ctx context.Context) (int, error)
+	QuerierTX interface {
+		Querier
+		Commit(ctx context.Context) error
+		Rollback(ctx context.Context) error
 	}
 
-	LogoRepo interface {
-		Add(ctx context.Context, logo *entity.Logo) (*entity.LogoResp, error)
-		Update(ctx context.Context, id int, logo *entity.LogoUpdate) (*entity.LogoResp, error)
-		Delete(ctx context.Context, id int) error
-		GetByID(ctx context.Context, logoID int) (*entity.LogoResp, error)
-		GetAllWithPagination(ctx context.Context, limit, offset int) (map[int]*entity.Logo, error)
-		GetAll(ctx context.Context) ([]*entity.LogoResp, error)
-		Count(ctx context.Context) (int, error)
-	}
-
-	TGRepo interface {
-		Add(ctx context.Context, tg *entity.TG) (*entity.TGResp, error)
-		Update(ctx context.Context, id int, tg *entity.TGUpdate) (*entity.TGResp, error)
-		Delete(ctx context.Context, id int) error
-		GetAllWithPagination(ctx context.Context, limit, offset int) ([]*entity.TGResp, error)
-		Count(ctx context.Context) (int, error)
-	}
+	TransactionFunc func(ctx context.Context, qe Querier) error
 )
 
-func New(pool *pgxpool.Pool) *Repository {
-	return &Repository{
-		AdvRepo:   postgres.NewAdvRepo(pool),
-		ColorRepo: postgres.NewColorRepo(pool),
-		LogoRepo:  postgres.NewLogorRepo(pool),
-		TGRepo:    postgres.NewTGRepo(pool),
+func NewDBTX(db Querier) *DBTX {
+	return &DBTX{qe: db}
+}
+
+func (d *DBTX) DB() Querier {
+	return d.qe
+}
+
+func (d *DBTX) InTransaction(ctx context.Context, fn TransactionFunc) error {
+	tx, err := d.qe.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("begin transaction: %w", err)
 	}
+
+	err = fn(ctx, tx)
+	if err != nil {
+		// TODO: убоать pgx.ErrTxClosed
+		if rbErr := tx.Rollback(ctx); rbErr != nil && !errors.Is(err, pgx.ErrTxClosed) {
+			return fmt.Errorf("rollback err: %w; err: %w", rbErr, err)
+		}
+		return err
+	}
+
+	return tx.Commit(ctx)
 }
