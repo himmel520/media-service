@@ -69,9 +69,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ad'
+                $ref: '#/components/schemas/ads'
         '400':
           description: Ошибка в запросе (неверный формат данных или параметры)
           content:
@@ -1002,6 +1000,10 @@ components:
             - 2
             - 3
           example: 2
+    ads:
+      type: array
+      items:
+        $ref: '#/components/schemas/ad'
     adsResp:
       type: object
       properties:

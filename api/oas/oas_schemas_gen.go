@@ -358,6 +358,10 @@ func (s *AdminBearerAuth) SetToken(val string) {
 	s.Token = val
 }
 
+type Ads []Ad
+
+func (*Ads) v1AdsGetRes() {}
+
 // Ref: #
 type AdsResp struct {
 	Data []Ad `json:"data"`
@@ -1834,10 +1838,6 @@ func (*V1AdsGetBadRequest) v1AdsGetRes() {}
 type V1AdsGetNotFound Error
 
 func (*V1AdsGetNotFound) v1AdsGetRes() {}
-
-type V1AdsGetOKApplicationJSON []Ad
-
-func (*V1AdsGetOKApplicationJSON) v1AdsGetRes() {}
 
 type V1AdsGetPriority int
 

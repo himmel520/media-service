@@ -10,14 +10,12 @@ import (
 	"syscall"
 
 	"github.com/himmel520/uoffer/mediaAd/config"
-	httpctrl "github.com/himmel520/uoffer/mediaAd/internal/controller/http"
 	"github.com/himmel520/uoffer/mediaAd/pkg/logger"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
+	"github.com/himmel520/uoffer/mediaAd/internal/controller/ogen"
+	"github.com/himmel520/uoffer/mediaAd/internal/controller/ogen/auth"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/postgres"
-	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 )
 
 // @title API Documentation
@@ -27,6 +25,7 @@ import (
 // @BasePath /api/v1
 
 func main() {
+	// config
 	logLevel := flag.String("loglevel", "info", "log level: debug, info, warn, error")
 	flag.Parse()
 
@@ -37,25 +36,35 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// db
 	db, err := postgres.NewPG(cfg.DB.DBConn)
 	if err != nil {
 		log.Fatalf("unable to connect to pool: %v", err)
 	}
 	defer db.Close()
 
+	// cache
 	rdb, err := redis.NewRedis(cfg.Cache.Conn)
 	if err != nil {
 		log.Fatalf("unable to connect to cache: %v", err)
 	}
 	defer rdb.Close()
 
-	cache := cache.New(rdb, cfg.Cache.Exp)
-	repo := repository.New(db)
-	usecase := usecase.New(repo, cache, cfg.Srv.JWT.PublicKey, log)
+	// cache := cache.New(rdb, cfg.Cache.Exp)
+	// repo := repository.New(db)
+	// usecase := usecase.New(repo, cache, cfg.Srv.JWT.PublicKey, log)
 
-	handler := httpctrl.NewHandler(usecase, log)
+	// handler := ogen.NewHandler(ogen.HandlerParams{
+	// 	Auth:     auth.New(log)),
+	// 	Error:    errHandler.New(),
+	// 	Category: categoryHandler.New(categoryUC, log),
+	// })
 
-	app := httpctrl.NewServer(handler.InitRoutes(), cfg.Srv.Addr)
+	app, err := ogen.NewServer(handler, cfg.Srv.Addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	go func() {
 		log.Infof("the server is starting on %v", cfg.Srv.Addr)
 
