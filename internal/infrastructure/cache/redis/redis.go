@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
+	"github.com/himmel520/media-service/internal/infrastructure/cache/errcache"
 	goredis "github.com/redis/go-redis/v9"
 )
 

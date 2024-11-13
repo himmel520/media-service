@@ -23,9 +23,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: "../schemas/ads/ad.yml"
+            $ref: "../schemas/ads/ads.yml"
     '400':
       description: Ошибка в запросе (неверный формат данных или параметры)
       content:

@@ -3069,7 +3069,7 @@ func decodeV1AdsGetResponse(resp *http.Response) (res V1AdsGetRes, _ error) {
 			}
 			d := jx.DecodeBytes(buf)
 
-			var response V1AdsGetOKApplicationJSON
+			var response Ads
 			if err := func() error {
 				if err := response.Decode(d); err != nil {
 					return err

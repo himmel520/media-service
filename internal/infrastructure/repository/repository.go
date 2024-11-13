@@ -3,9 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/postgres"
-
+	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/repository/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 

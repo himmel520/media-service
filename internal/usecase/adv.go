@@ -9,10 +9,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/himmel520/uoffer/mediaAd/internal/entity"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/errcache"
-	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
+	"github.com/himmel520/media-service/internal/infrastructure/repository"
+	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
+	"github.com/himmel520/media-service/internal/infrastructure/cache/errcache"
 
 	"github.com/sirupsen/logrus"
 )
@@ -71,7 +71,7 @@ func (uc *AdvUsecase) GetAllWithFilter(ctx context.Context, limit, offset int, p
 
 		return advs, nil
 	}
-	
+
 	err = json.Unmarshal([]byte(val), &advs)
 	return advs, err
 }

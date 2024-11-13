@@ -1,4 +1,4 @@
-package server
+package httpctrl
 
 import (
 	"context"
@@ -10,7 +10,7 @@ type Server struct {
 	httpServer *http.Server
 }
 
-func New(handler http.Handler, addr string) *Server {
+func NewServer(handler http.Handler, addr string) *Server {
 	return &Server{
 		httpServer: &http.Server{
 			Addr:         addr,

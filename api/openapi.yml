@@ -42,8 +42,3 @@ components:
       scheme: bearer
       bearerFormat: JWT
       description: JWT token for admin authentication
-    userBearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-      description: JWT token for user authentication
