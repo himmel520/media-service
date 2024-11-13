@@ -951,6 +951,10 @@ components:
           type: string
           description: HEX код цвета
           example: '#FF0000'
+      required:
+        - id
+        - title
+        - hex
     tg:
       type: object
       properties:
@@ -1035,17 +1039,17 @@ components:
         images_id:
           type: integer
           description: Идентификатор изображения
-          min: 1
+          minimum: 1
           example: 1
         colors_id:
           type: integer
           description: Идентификатор цвета
-          min: 1
+          minimum: 1
           example: 3
         tg_id:
           type: integer
           description: Идентификатор тега
-          min: 1
+          minimum: 1
           example: 2
         title:
           type: string
@@ -1087,17 +1091,17 @@ components:
         images_id:
           type: integer
           description: Идентификатор изображения
-          min: 1
+          minimum: 1
           example: 1
         colors_id:
           type: integer
           description: Идентификатор цвета
-          min: 1
+          minimum: 1
           example: 3
         tg_id:
           type: integer
           description: Идентификатор тега
-          min: 1
+          minimum: 1
           example: 2
         title:
           type: string
@@ -1196,6 +1200,10 @@ components:
           type: integer
           description: Количество записей на странице
           example: 1
+      required:
+        - page
+        - pages
+        - per_page
     colorPost:
       type: object
       properties:

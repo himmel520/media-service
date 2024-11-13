@@ -837,22 +837,16 @@ func (s *Color) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *Color) encodeFields(e *jx.Encoder) {
 	{
-		if s.ID.Set {
-			e.FieldStart("id")
-			s.ID.Encode(e)
-		}
+		e.FieldStart("id")
+		e.Int(s.ID)
 	}
 	{
-		if s.Title.Set {
-			e.FieldStart("title")
-			s.Title.Encode(e)
-		}
+		e.FieldStart("title")
+		e.Str(s.Title)
 	}
 	{
-		if s.Hex.Set {
-			e.FieldStart("hex")
-			s.Hex.Encode(e)
-		}
+		e.FieldStart("hex")
+		e.Str(s.Hex)
 	}
 }
 
@@ -867,13 +861,16 @@ func (s *Color) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode Color to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
 		case "id":
+			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
-				s.ID.Reset()
-				if err := s.ID.Decode(d); err != nil {
+				v, err := d.Int()
+				s.ID = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -881,9 +878,11 @@ func (s *Color) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"id\"")
 			}
 		case "title":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Title.Reset()
-				if err := s.Title.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Title = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -891,9 +890,11 @@ func (s *Color) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"title\"")
 			}
 		case "hex":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Hex.Reset()
-				if err := s.Hex.Decode(d); err != nil {
+				v, err := d.Str()
+				s.Hex = string(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -906,6 +907,38 @@ func (s *Color) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode Color")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00000111,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfColor) {
+					name = jsonFieldsNameOfColor[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil
@@ -1137,22 +1170,16 @@ func (s *ColorsResp) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Page.Set {
-			e.FieldStart("page")
-			s.Page.Encode(e)
-		}
+		e.FieldStart("page")
+		e.Int(s.Page)
 	}
 	{
-		if s.Pages.Set {
-			e.FieldStart("pages")
-			s.Pages.Encode(e)
-		}
+		e.FieldStart("pages")
+		e.Int(s.Pages)
 	}
 	{
-		if s.PerPage.Set {
-			e.FieldStart("per_page")
-			s.PerPage.Encode(e)
-		}
+		e.FieldStart("per_page")
+		e.Int(s.PerPage)
 	}
 }
 
@@ -1168,6 +1195,7 @@ func (s *ColorsResp) Decode(d *jx.Decoder) error {
 	if s == nil {
 		return errors.New("invalid: unable to decode ColorsResp to nil")
 	}
+	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
@@ -1189,9 +1217,11 @@ func (s *ColorsResp) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"data\"")
 			}
 		case "page":
+			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
-				s.Page.Reset()
-				if err := s.Page.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Page = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1199,9 +1229,11 @@ func (s *ColorsResp) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"page\"")
 			}
 		case "pages":
+			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
-				s.Pages.Reset()
-				if err := s.Pages.Decode(d); err != nil {
+				v, err := d.Int()
+				s.Pages = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1209,9 +1241,11 @@ func (s *ColorsResp) Decode(d *jx.Decoder) error {
 				return errors.Wrap(err, "decode field \"pages\"")
 			}
 		case "per_page":
+			requiredBitSet[0] |= 1 << 3
 			if err := func() error {
-				s.PerPage.Reset()
-				if err := s.PerPage.Decode(d); err != nil {
+				v, err := d.Int()
+				s.PerPage = int(v)
+				if err != nil {
 					return err
 				}
 				return nil
@@ -1224,6 +1258,38 @@ func (s *ColorsResp) Decode(d *jx.Decoder) error {
 		return nil
 	}); err != nil {
 		return errors.Wrap(err, "decode ColorsResp")
+	}
+	// Validate required fields.
+	var failures []validate.FieldError
+	for i, mask := range [1]uint8{
+		0b00001110,
+	} {
+		if result := (requiredBitSet[i] & mask) ^ mask; result != 0 {
+			// Mask only required fields and check equality to mask using XOR.
+			//
+			// If XOR result is not zero, result is not equal to expected, so some fields are missed.
+			// Bits of fields which would be set are actually bits of missed fields.
+			missed := bits.OnesCount8(result)
+			for bitN := 0; bitN < missed; bitN++ {
+				bitIdx := bits.TrailingZeros8(result)
+				fieldIdx := i*8 + bitIdx
+				var name string
+				if fieldIdx < len(jsonFieldsNameOfColorsResp) {
+					name = jsonFieldsNameOfColorsResp[fieldIdx]
+				} else {
+					name = strconv.Itoa(fieldIdx)
+				}
+				failures = append(failures, validate.FieldError{
+					Name:  name,
+					Error: validate.ErrFieldRequired,
+				})
+				// Reset bit.
+				result &^= 1 << bitIdx
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return &validate.Error{Fields: failures}
 	}
 
 	return nil

@@ -9,17 +9,17 @@ properties:
   images_id:
     type: integer
     description: Идентификатор изображения
-    min: 1
+    minimum: 1
     example: 1
   colors_id:
     type: integer
     description: Идентификатор цвета
-    min: 1
+    minimum: 1
     example: 3
   tg_id:
     type: integer
     description: Идентификатор тега
-    min: 1
+    minimum: 1
     example: 2
   title:
     type: string

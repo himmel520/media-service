@@ -418,40 +418,40 @@ func (*AdsResp) v1AdminAdsGetRes() {}
 // Ref: #
 type Color struct {
 	// Идентификатор цвета.
-	ID OptInt `json:"id"`
+	ID int `json:"id"`
 	// Название цвета.
-	Title OptString `json:"title"`
+	Title string `json:"title"`
 	// HEX код цвета.
-	Hex OptString `json:"hex"`
+	Hex string `json:"hex"`
 }
 
 // GetID returns the value of ID.
-func (s *Color) GetID() OptInt {
+func (s *Color) GetID() int {
 	return s.ID
 }
 
 // GetTitle returns the value of Title.
-func (s *Color) GetTitle() OptString {
+func (s *Color) GetTitle() string {
 	return s.Title
 }
 
 // GetHex returns the value of Hex.
-func (s *Color) GetHex() OptString {
+func (s *Color) GetHex() string {
 	return s.Hex
 }
 
 // SetID sets the value of ID.
-func (s *Color) SetID(val OptInt) {
+func (s *Color) SetID(val int) {
 	s.ID = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Color) SetTitle(val OptString) {
+func (s *Color) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetHex sets the value of Hex.
-func (s *Color) SetHex(val OptString) {
+func (s *Color) SetHex(val string) {
 	s.Hex = val
 }
 
@@ -518,11 +518,11 @@ func (s *ColorPut) SetHex(val OptString) {
 type ColorsResp struct {
 	Data []Color `json:"data"`
 	// Текущая страница.
-	Page OptInt `json:"page"`
+	Page int `json:"page"`
 	// Количество страниц.
-	Pages OptInt `json:"pages"`
+	Pages int `json:"pages"`
 	// Количество записей на странице.
-	PerPage OptInt `json:"per_page"`
+	PerPage int `json:"per_page"`
 }
 
 // GetData returns the value of Data.
@@ -531,17 +531,17 @@ func (s *ColorsResp) GetData() []Color {
 }
 
 // GetPage returns the value of Page.
-func (s *ColorsResp) GetPage() OptInt {
+func (s *ColorsResp) GetPage() int {
 	return s.Page
 }
 
 // GetPages returns the value of Pages.
-func (s *ColorsResp) GetPages() OptInt {
+func (s *ColorsResp) GetPages() int {
 	return s.Pages
 }
 
 // GetPerPage returns the value of PerPage.
-func (s *ColorsResp) GetPerPage() OptInt {
+func (s *ColorsResp) GetPerPage() int {
 	return s.PerPage
 }
 
@@ -551,17 +551,17 @@ func (s *ColorsResp) SetData(val []Color) {
 }
 
 // SetPage sets the value of Page.
-func (s *ColorsResp) SetPage(val OptInt) {
+func (s *ColorsResp) SetPage(val int) {
 	s.Page = val
 }
 
 // SetPages sets the value of Pages.
-func (s *ColorsResp) SetPages(val OptInt) {
+func (s *ColorsResp) SetPages(val int) {
 	s.Pages = val
 }
 
 // SetPerPage sets the value of PerPage.
-func (s *ColorsResp) SetPerPage(val OptInt) {
+func (s *ColorsResp) SetPerPage(val int) {
 	s.PerPage = val
 }
 
