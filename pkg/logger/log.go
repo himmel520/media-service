@@ -1,4 +1,4 @@
-package server
+package logger
 
 import (
 	"fmt"
@@ -8,8 +8,9 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func SetupLogger() *logrus.Logger {
+func SetupLogger(level string) *logrus.Logger {
 	log := logrus.New()
+
 	log.SetReportCaller(true)
 	log.Formatter = &logrus.JSONFormatter{
 		CallerPrettyfier: func(f *runtime.Frame) (function string, file string) {
@@ -19,6 +20,14 @@ func SetupLogger() *logrus.Logger {
 		},
 		PrettyPrint: true,
 	}
-	
+
+	lvl, err := logrus.ParseLevel(level)
+	if err != nil {
+		log.Warn(err, "The level info is used")
+		return log
+	}
+
+	log.Level = lvl
+
 	return log
 }

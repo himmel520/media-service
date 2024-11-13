@@ -206,7 +206,7 @@ func TestDeleteCategoriesCache(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			mockAdvUsecase := new(mocks.AdvUC)
-			h := New(&usecase.Usecase{Adv: mockAdvUsecase}, logrus.New())
+			h := NewHandler(&usecase.Usecase{Adv: mockAdvUsecase}, logrus.New())
 
 			tc.mockBehaviour(mockAdvUsecase)
 

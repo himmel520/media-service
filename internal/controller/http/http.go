@@ -15,7 +15,7 @@ type Handler struct {
 	log *logrus.Logger
 }
 
-func New(uc *usecase.Usecase, log *logrus.Logger) *Handler {
+func NewHandler(uc *usecase.Usecase, log *logrus.Logger) *Handler {
 	return &Handler{
 		uc:  uc,
 		log: log,

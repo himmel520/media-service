@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"flag"
 	"net/http"
 	"os"
 	"os/signal"
@@ -10,12 +11,12 @@ import (
 
 	"github.com/himmel520/uoffer/mediaAd/config"
 	httpctrl "github.com/himmel520/uoffer/mediaAd/internal/controller/http"
+	"github.com/himmel520/uoffer/mediaAd/pkg/logger"
 
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/cache/redis"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository"
 	"github.com/himmel520/uoffer/mediaAd/internal/infrastructure/repository/postgres"
-	"github.com/himmel520/uoffer/mediaAd/internal/server"
 	"github.com/himmel520/uoffer/mediaAd/internal/usecase"
 )
 
@@ -26,7 +27,10 @@ import (
 // @BasePath /api/v1
 
 func main() {
-	log := server.SetupLogger()
+	logLevel := flag.String("loglevel", "info", "log level: debug, info, warn, error")
+	flag.Parse()
+
+	log := logger.SetupLogger(*logLevel)
 
 	cfg, err := config.New()
 	if err != nil {
@@ -49,9 +53,9 @@ func main() {
 	repo := repository.New(db)
 	usecase := usecase.New(repo, cache, cfg.Srv.JWT.PublicKey, log)
 
-	handler := httpctrl.New(usecase, log)
+	handler := httpctrl.NewHandler(usecase, log)
 
-	app := server.New(handler.InitRoutes(), cfg.Srv.Addr)
+	app := httpctrl.NewServer(handler.InitRoutes(), cfg.Srv.Addr)
 	go func() {
 		log.Infof("the server is starting on %v", cfg.Srv.Addr)
 
