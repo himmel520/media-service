@@ -7,5 +7,6 @@ import (
 )
 
 func (uc *ColorUC) Add(ctx context.Context, color *entity.Color) (*entity.ColorResp, error) {
-	return uc.repo.Add(ctx, color)
+	// return uc.repo.Add(ctx, color)
+	return nil, nil
 }

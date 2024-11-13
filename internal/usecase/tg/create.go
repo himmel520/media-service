@@ -7,5 +7,6 @@ import (
 )
 
 func (uc *TgUC) Add(ctx context.Context, tg *entity.TG) (*entity.TGResp, error) {
-	return uc.repo.Add(ctx, tg)
+	// return uc.repo.Add(ctx, tg)
+	return nil, nil
 }

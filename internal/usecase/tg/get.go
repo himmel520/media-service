@@ -7,18 +7,19 @@ import (
 )
 
 func (uc *TgUC) GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.TGsResp, error) {
-	tgs, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
-	if err != nil {
-		return nil, err
-	}
+	// tgs, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	count, err := uc.repo.Count(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// count, err := uc.repo.Count(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return &entity.TGsResp{
-		TGs:   tgs,
-		Total: count,
-	}, err
+	// return &entity.TGsResp{
+	// 	TGs:   tgs,
+	// 	Total: count,
+	// }, err
+	return nil, nil
 }

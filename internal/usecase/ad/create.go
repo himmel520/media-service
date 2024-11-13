@@ -7,10 +7,11 @@ import (
 )
 
 func (uc *AdUC) Add(ctx context.Context, adv *entity.Adv) (*entity.AdvResponse, error) {
-	id, err := uc.repo.Add(ctx, adv)
-	if err != nil {
-		return nil, err
-	}
+	// id, err := uc.repo.Add(ctx, adv)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	return uc.repo.GetByID(ctx, id)
+	// return uc.repo.GetByID(ctx, id)
+	return nil, nil
 }

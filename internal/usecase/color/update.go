@@ -7,5 +7,6 @@ import (
 )
 
 func (uc *ColorUC) Update(ctx context.Context, id int, color *entity.ColorUpdate) (*entity.ColorResp, error) {
-	return uc.repo.Update(ctx, id, color)
+	// return uc.repo.Update(ctx, id, color)
+	return nil, nil
 }
