@@ -17,15 +17,8 @@ func (s *Ad) Validate() error {
 
 	var failures []validate.FieldError
 	if err := func() error {
-		if value, ok := s.Image.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.Image.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -35,15 +28,8 @@ func (s *Ad) Validate() error {
 		})
 	}
 	if err := func() error {
-		if value, ok := s.Priority.Get(); ok {
-			if err := func() error {
-				if err := value.Validate(); err != nil {
-					return err
-				}
-				return nil
-			}(); err != nil {
-				return err
-			}
+		if err := s.Priority.Validate(); err != nil {
+			return err
 		}
 		return nil
 	}(); err != nil {
@@ -916,7 +902,7 @@ func (s *TgPut) Validate() error {
 	return nil
 }
 
-func (s V1AdsGetPriority) Validate() error {
+func (s V1AdsGetPriorityItem) Validate() error {
 	switch s {
 	case 1:
 		return nil

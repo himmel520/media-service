@@ -41,7 +41,7 @@ type TgsResp struct {
 
 func (c *TgsResp) ToApi() *api.TgsResp {
 	return &api.TgsResp{
-		Data:    convert.ApplyToSlice(c.Data, TgToApi),
+		Data:    convert.ApplyPointerToSlice(c.Data, TgToApi),
 		Page:    int(c.Page),
 		Pages:   int(c.Pages),
 		PerPage: int(c.PerPage),

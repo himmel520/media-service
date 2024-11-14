@@ -37,7 +37,7 @@ type ColorsResp struct {
 
 func (c *ColorsResp) ToApi() *api.ColorsResp {
 	return &api.ColorsResp{
-		Data:    convert.ApplyToSlice(c.Data, ColorToApi),
+		Data:    convert.ApplyPointerToSlice(c.Data, ColorToApi),
 		Page:    int(c.Page),
 		Pages:   int(c.Pages),
 		PerPage: int(c.PerPage),

@@ -71,7 +71,7 @@ type ImagesResp struct {
 
 func (c *ImagesResp) ToApi() *api.ImagesResp {
 	return &api.ImagesResp{
-		Data:    convert.ApplyToSlice(c.Data, ImageToApi),
+		Data:    convert.ApplyPointerToSlice(c.Data, ImageToApi),
 		Page:    int(c.Page),
 		Pages:   int(c.Pages),
 		PerPage: int(c.PerPage),

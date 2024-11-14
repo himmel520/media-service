@@ -3,71 +3,66 @@ package adRepo
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strings"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (r *AdRepo) Update(ctx context.Context, qe repository.Querier, id int, adv *entity.AdvUpdate) error {
-	var keys []string
-	var values []interface{}
+func (r *AdRepo) Update(ctx context.Context, qe repository.Querier, id int, adv *entity.AdvUpdate) (*entity.AdvResp, error) {
+	builder := squirrel.Update("adv").
+		Where(squirrel.Eq{"id": id}).
+		Suffix(`returning id`).
+		PlaceholderFormat(squirrel.Dollar)
 
-	if adv.LogoID != nil {
-		keys = append(keys, "logos_id=$1")
-		values = append(values, adv.LogoID)
+	if adv.ImageID.Set {
+		builder = builder.Set("images_id", adv.ImageID.Value)
 	}
 
-	if adv.ColorID != nil {
-		keys = append(keys, fmt.Sprintf("colors_id=$%d", len(keys)+1))
-		values = append(values, adv.ColorID)
+	if adv.ColorID.Set {
+		builder = builder.Set("colors_id", adv.ColorID.Value)
 	}
 
-	if adv.TgID != nil {
-		keys = append(keys, fmt.Sprintf("tg_id=$%d", len(keys)+1))
-		values = append(values, adv.TgID)
+	if adv.TgID.Set {
+		builder = builder.Set("tg_id", adv.TgID.Value)
 	}
 
-	if adv.Post != nil {
-		keys = append(keys, fmt.Sprintf("post=$%d", len(keys)+1))
-		values = append(values, adv.Post)
+	if adv.Post.Set {
+		builder = builder.Set("post", adv.Post.Value)
 	}
 
-	if adv.Title != nil {
-		keys = append(keys, fmt.Sprintf("title=$%d", len(keys)+1))
-		values = append(values, adv.Title)
+	if adv.Title.Set {
+		builder = builder.Set("title", adv.Title.Value)
 	}
 
-	if adv.Description != nil {
-		keys = append(keys, fmt.Sprintf("description=$%d", len(keys)+1))
-		values = append(values, adv.Description)
+	if adv.Description.Set {
+		builder = builder.Set("description", adv.Description.Value)
 	}
 
-	if adv.Priority != nil {
-		keys = append(keys, fmt.Sprintf("priority=$%d", len(keys)+1))
-		values = append(values, adv.Priority)
+	if adv.Priority.Set {
+		builder = builder.Set("post", adv.Priority.Value)
 	}
 
-	values = append(values, id)
-	query := fmt.Sprintf(`
-	update adv 
-		set %s 
-	where id = $%d`, strings.Join(keys, ", "), len(values))
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	cmdTag, err := qe.Exec(ctx, query, args...)
 
 	var pgErr *pgconn.PgError
-	cmdTag, err := qe.Exec(ctx, query, values...)
-	if errors.As(err, &pgErr) {
-		if pgErr.Code == repoerr.FKViolation {
-			return repoerr.ErrAdvDependencyNotExist
+	if err != nil {
+		if errors.As(err, &pgErr) && pgErr.Code == repoerr.FKViolation {
+			return nil, repoerr.ErrAdvDependencyNotExist
 		}
+		return nil, err
 	}
 
 	if cmdTag.RowsAffected() == 0 {
-		return repoerr.ErrAdvNotFound
+		return nil, repoerr.ErrAdvNotFound
 	}
 
-	return err
+	return r.GetByID(ctx, qe, id)
 }

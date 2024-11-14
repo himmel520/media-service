@@ -34,7 +34,10 @@ func (r *ColorRepo) Get(ctx context.Context, qe repository.Querier, params repos
 	colors := []*entity.Color{}
 	for rows.Next() {
 		color := &entity.Color{}
-		if err := rows.Scan(&color.ID, &color.Title, &color.Hex); err != nil {
+		if err := rows.Scan(
+			&color.ID, 
+			&color.Title, 
+			&color.Hex); err != nil {
 			return nil, err
 		}
 

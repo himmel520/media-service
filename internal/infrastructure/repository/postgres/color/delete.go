@@ -20,13 +20,14 @@ func (r *ColorRepo) Delete(ctx context.Context, qe repository.Querier, id int) e
 	}
 
 	cmdTag, err := qe.Exec(ctx, query, args...)
-	if cmdTag.RowsAffected() == 0 {
-		return repoerr.ErrColorNotFound
-	}
-
+	
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == repoerr.FKViolation {
 		return repoerr.ErrColorDependencyExist
+	}
+
+	if cmdTag.RowsAffected() == 0 {
+		return repoerr.ErrColorNotFound
 	}
 
 	return err

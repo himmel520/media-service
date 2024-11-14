@@ -52,17 +52,28 @@ paths:
           description: Фильтр по приоритету
           required: false
           schema:
-            type: integer
-            enum:
-              - 1
-              - 2
-              - 3
+            type: array
+            items:
+              type: integer
+              enum:
+                - 1
+                - 2
+                - 3
+          style: form
+          explode: false
         - name: post
           in: query
-          description: Фильтр по должности (например, "Golang")
+          description: Фильтр по должности
           required: false
           schema:
-            type: string
+            type: array
+            items:
+              type: string
+          style: form
+          explode: false
+          example:
+            - Golang
+            - Frontend
       responses:
         '200':
           description: Список реклам успешно получен
@@ -103,7 +114,7 @@ paths:
           required: false
           schema:
             type: integer
-            default: 1
+            default: 0
         - name: per_page
           in: query
           description: Количество элементов на странице
@@ -1028,6 +1039,15 @@ components:
             - 2
             - 3
           example: 2
+      required:
+        - id
+        - image
+        - color
+        - tg
+        - post
+        - title
+        - description
+        - priority
     ads:
       type: array
       items:
@@ -1051,6 +1071,10 @@ components:
           type: integer
           description: Количество записей на странице
           example: 1
+      required:
+        - page
+        - pages
+        - per_page
     adPost:
       type: object
       properties:
@@ -1270,11 +1294,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/image'
-          example:
-            - id: 1
-              title: Логотип компании
-              url: https://example.com/logo.png
-              type: logo
         page:
           type: integer
           description: Текущая страница

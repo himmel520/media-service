@@ -9,14 +9,23 @@ get:
       description: Фильтр по приоритету
       required: false
       schema:
-        type: integer
-        enum: [1, 2, 3]
+        type: array
+        items:
+          type: integer
+          enum: [1, 2, 3]  # Возможные значения приоритетов
+      style: form
+      explode: false
     - name: post
       in: query
-      description: Фильтр по должности (например, "Golang")
+      description: Фильтр по должности
       required: false
       schema:
-        type: string
+        type: array
+        items:
+          type: string
+      style: form
+      explode: false
+      example: ["Golang", "Frontend"]
   responses:
     '200':
       description: Список реклам успешно получен

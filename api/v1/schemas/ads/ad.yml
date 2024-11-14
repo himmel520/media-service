@@ -27,3 +27,12 @@ properties:
     description: Приоритет рекламы
     enum: [1, 2, 3]
     example: 2
+required:
+  - id 
+  - image
+  - color 
+  - tg 
+  - post 
+  - title 
+  - description
+  - priority 

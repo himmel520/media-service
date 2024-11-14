@@ -22,5 +22,6 @@ func (h *Handler) V1AdminColorsPost(ctx context.Context, req *api.ColorPost) (ap
 		h.log.Error(err)
 		return nil, err
 	}
+	
 	return entity.ColorToApi(color), nil
 }

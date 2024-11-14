@@ -17,97 +17,97 @@ func (s *ErrorStatusCode) Error() string {
 // Ref: #
 type Ad struct {
 	// Идентификатор рекламы.
-	ID    OptInt   `json:"id"`
-	Image OptImage `json:"image"`
-	Color OptColor `json:"color"`
-	Tg    OptTg    `json:"tg"`
+	ID    int   `json:"id"`
+	Image Image `json:"image"`
+	Color Color `json:"color"`
+	Tg    Tg    `json:"tg"`
 	// Должность, связанная с рекламой.
-	Post OptString `json:"post"`
+	Post string `json:"post"`
 	// Заголовок рекламы.
-	Title OptString `json:"title"`
+	Title string `json:"title"`
 	// Описание рекламы.
-	Description OptString `json:"description"`
+	Description string `json:"description"`
 	// Приоритет рекламы.
-	Priority OptAdPriority `json:"priority"`
+	Priority AdPriority `json:"priority"`
 }
 
 // GetID returns the value of ID.
-func (s *Ad) GetID() OptInt {
+func (s *Ad) GetID() int {
 	return s.ID
 }
 
 // GetImage returns the value of Image.
-func (s *Ad) GetImage() OptImage {
+func (s *Ad) GetImage() Image {
 	return s.Image
 }
 
 // GetColor returns the value of Color.
-func (s *Ad) GetColor() OptColor {
+func (s *Ad) GetColor() Color {
 	return s.Color
 }
 
 // GetTg returns the value of Tg.
-func (s *Ad) GetTg() OptTg {
+func (s *Ad) GetTg() Tg {
 	return s.Tg
 }
 
 // GetPost returns the value of Post.
-func (s *Ad) GetPost() OptString {
+func (s *Ad) GetPost() string {
 	return s.Post
 }
 
 // GetTitle returns the value of Title.
-func (s *Ad) GetTitle() OptString {
+func (s *Ad) GetTitle() string {
 	return s.Title
 }
 
 // GetDescription returns the value of Description.
-func (s *Ad) GetDescription() OptString {
+func (s *Ad) GetDescription() string {
 	return s.Description
 }
 
 // GetPriority returns the value of Priority.
-func (s *Ad) GetPriority() OptAdPriority {
+func (s *Ad) GetPriority() AdPriority {
 	return s.Priority
 }
 
 // SetID sets the value of ID.
-func (s *Ad) SetID(val OptInt) {
+func (s *Ad) SetID(val int) {
 	s.ID = val
 }
 
 // SetImage sets the value of Image.
-func (s *Ad) SetImage(val OptImage) {
+func (s *Ad) SetImage(val Image) {
 	s.Image = val
 }
 
 // SetColor sets the value of Color.
-func (s *Ad) SetColor(val OptColor) {
+func (s *Ad) SetColor(val Color) {
 	s.Color = val
 }
 
 // SetTg sets the value of Tg.
-func (s *Ad) SetTg(val OptTg) {
+func (s *Ad) SetTg(val Tg) {
 	s.Tg = val
 }
 
 // SetPost sets the value of Post.
-func (s *Ad) SetPost(val OptString) {
+func (s *Ad) SetPost(val string) {
 	s.Post = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Ad) SetTitle(val OptString) {
+func (s *Ad) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetDescription sets the value of Description.
-func (s *Ad) SetDescription(val OptString) {
+func (s *Ad) SetDescription(val string) {
 	s.Description = val
 }
 
 // SetPriority sets the value of Priority.
-func (s *Ad) SetPriority(val OptAdPriority) {
+func (s *Ad) SetPriority(val AdPriority) {
 	s.Priority = val
 }
 
@@ -366,11 +366,11 @@ func (*Ads) v1AdsGetRes() {}
 type AdsResp struct {
 	Data []Ad `json:"data"`
 	// Текущая страница.
-	Page OptInt `json:"page"`
+	Page int `json:"page"`
 	// Количество страниц.
-	Pages OptInt `json:"pages"`
+	Pages int `json:"pages"`
 	// Количество записей на странице.
-	PerPage OptInt `json:"per_page"`
+	PerPage int `json:"per_page"`
 }
 
 // GetData returns the value of Data.
@@ -379,17 +379,17 @@ func (s *AdsResp) GetData() []Ad {
 }
 
 // GetPage returns the value of Page.
-func (s *AdsResp) GetPage() OptInt {
+func (s *AdsResp) GetPage() int {
 	return s.Page
 }
 
 // GetPages returns the value of Pages.
-func (s *AdsResp) GetPages() OptInt {
+func (s *AdsResp) GetPages() int {
 	return s.Pages
 }
 
 // GetPerPage returns the value of PerPage.
-func (s *AdsResp) GetPerPage() OptInt {
+func (s *AdsResp) GetPerPage() int {
 	return s.PerPage
 }
 
@@ -399,17 +399,17 @@ func (s *AdsResp) SetData(val []Ad) {
 }
 
 // SetPage sets the value of Page.
-func (s *AdsResp) SetPage(val OptInt) {
+func (s *AdsResp) SetPage(val int) {
 	s.Page = val
 }
 
 // SetPages sets the value of Pages.
-func (s *AdsResp) SetPages(val OptInt) {
+func (s *AdsResp) SetPages(val int) {
 	s.Pages = val
 }
 
 // SetPerPage sets the value of PerPage.
-func (s *AdsResp) SetPerPage(val OptInt) {
+func (s *AdsResp) SetPerPage(val int) {
 	s.PerPage = val
 }
 
@@ -1033,52 +1033,6 @@ func (s *LogosRespItemType) UnmarshalText(data []byte) error {
 	}
 }
 
-// NewOptAdPriority returns new OptAdPriority with value set to v.
-func NewOptAdPriority(v AdPriority) OptAdPriority {
-	return OptAdPriority{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptAdPriority is optional AdPriority.
-type OptAdPriority struct {
-	Value AdPriority
-	Set   bool
-}
-
-// IsSet returns true if OptAdPriority was set.
-func (o OptAdPriority) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptAdPriority) Reset() {
-	var v AdPriority
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptAdPriority) SetTo(v AdPriority) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptAdPriority) Get() (v AdPriority, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptAdPriority) Or(d AdPriority) AdPriority {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptAdPutPriority returns new OptAdPutPriority with value set to v.
 func NewOptAdPutPriority(v AdPutPriority) OptAdPutPriority {
 	return OptAdPutPriority{
@@ -1119,98 +1073,6 @@ func (o OptAdPutPriority) Get() (v AdPutPriority, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptAdPutPriority) Or(d AdPutPriority) AdPutPriority {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptColor returns new OptColor with value set to v.
-func NewOptColor(v Color) OptColor {
-	return OptColor{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptColor is optional Color.
-type OptColor struct {
-	Value Color
-	Set   bool
-}
-
-// IsSet returns true if OptColor was set.
-func (o OptColor) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptColor) Reset() {
-	var v Color
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptColor) SetTo(v Color) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptColor) Get() (v Color, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptColor) Or(d Color) Color {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptImage returns new OptImage with value set to v.
-func NewOptImage(v Image) OptImage {
-	return OptImage{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptImage is optional Image.
-type OptImage struct {
-	Value Image
-	Set   bool
-}
-
-// IsSet returns true if OptImage was set.
-func (o OptImage) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptImage) Reset() {
-	var v Image
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptImage) SetTo(v Image) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptImage) Get() (v Image, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptImage) Or(d Image) Image {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1355,52 +1217,6 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// NewOptTg returns new OptTg with value set to v.
-func NewOptTg(v Tg) OptTg {
-	return OptTg{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptTg is optional Tg.
-type OptTg struct {
-	Value Tg
-	Set   bool
-}
-
-// IsSet returns true if OptTg was set.
-func (o OptTg) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptTg) Reset() {
-	var v Tg
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptTg) SetTo(v Tg) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptTg) Get() (v Tg, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptTg) Or(d Tg) Tg {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
 // NewOptURI returns new OptURI with value set to v.
 func NewOptURI(v url.URL) OptURI {
 	return OptURI{
@@ -1441,52 +1257,6 @@ func (o OptURI) Get() (v url.URL, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptURI) Or(d url.URL) url.URL {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptV1AdsGetPriority returns new OptV1AdsGetPriority with value set to v.
-func NewOptV1AdsGetPriority(v V1AdsGetPriority) OptV1AdsGetPriority {
-	return OptV1AdsGetPriority{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptV1AdsGetPriority is optional V1AdsGetPriority.
-type OptV1AdsGetPriority struct {
-	Value V1AdsGetPriority
-	Set   bool
-}
-
-// IsSet returns true if OptV1AdsGetPriority was set.
-func (o OptV1AdsGetPriority) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptV1AdsGetPriority) Reset() {
-	var v V1AdsGetPriority
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptV1AdsGetPriority) SetTo(v V1AdsGetPriority) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptV1AdsGetPriority) Get() (v V1AdsGetPriority, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptV1AdsGetPriority) Or(d V1AdsGetPriority) V1AdsGetPriority {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -1877,20 +1647,20 @@ type V1AdsGetNotFound Error
 
 func (*V1AdsGetNotFound) v1AdsGetRes() {}
 
-type V1AdsGetPriority int
+type V1AdsGetPriorityItem int
 
 const (
-	V1AdsGetPriority1 V1AdsGetPriority = 1
-	V1AdsGetPriority2 V1AdsGetPriority = 2
-	V1AdsGetPriority3 V1AdsGetPriority = 3
+	V1AdsGetPriorityItem1 V1AdsGetPriorityItem = 1
+	V1AdsGetPriorityItem2 V1AdsGetPriorityItem = 2
+	V1AdsGetPriorityItem3 V1AdsGetPriorityItem = 3
 )
 
-// AllValues returns all V1AdsGetPriority values.
-func (V1AdsGetPriority) AllValues() []V1AdsGetPriority {
-	return []V1AdsGetPriority{
-		V1AdsGetPriority1,
-		V1AdsGetPriority2,
-		V1AdsGetPriority3,
+// AllValues returns all V1AdsGetPriorityItem values.
+func (V1AdsGetPriorityItem) AllValues() []V1AdsGetPriorityItem {
+	return []V1AdsGetPriorityItem{
+		V1AdsGetPriorityItem1,
+		V1AdsGetPriorityItem2,
+		V1AdsGetPriorityItem3,
 	}
 }
 
