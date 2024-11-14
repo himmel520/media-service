@@ -6,7 +6,6 @@ import (
 	"github.com/himmel520/media-service/internal/entity"
 )
 
-func (uc *TgUC) Add(ctx context.Context, tg *entity.TG) (*entity.TGResp, error) {
-	// return uc.repo.Add(ctx, tg)
-	return nil, nil
+func (uc *TgUC) Create(ctx context.Context, tg *entity.Tg) (*entity.Tg, error) {
+	return uc.repo.Create(ctx, uc.db.DB(), tg)
 }

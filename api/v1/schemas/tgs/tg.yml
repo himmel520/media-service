@@ -13,3 +13,7 @@ properties:
     description: URL тг
     format: uri
     example: "https://example.com"
+required:
+  - id
+  - title
+  - url

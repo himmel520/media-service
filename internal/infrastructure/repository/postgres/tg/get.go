@@ -3,26 +3,41 @@ package tgRepo
 import (
 	"context"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
 )
 
-func (r *TgRepo) GetAllWithPagination(ctx context.Context, qe repository.Querier, limit, offset int) ([]*entity.TGResp, error) {
-	rows, err := qe.Query(ctx, `
-	select * 
-		from tg
-	order by title asc
-	limit $1 offset $2`, limit, offset)
+func (r *TgRepo) Get(ctx context.Context, qe repository.Querier, params repository.PaginationParams) ([]*entity.Tg, error) {
+	query, args, err := squirrel.
+		Select(
+			"id",
+			"title",
+			"url").
+		From("tg").
+		OrderBy("title").
+		Limit(params.Limit).
+		Offset(params.Offset).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := qe.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	tgs := []*entity.TGResp{}
+	tgs := []*entity.Tg{}
 	for rows.Next() {
-		tg := &entity.TGResp{}
-		if err := rows.Scan(&tg.ID, &tg.Title, &tg.Url); err != nil {
+		tg := &entity.Tg{}
+		if err := rows.Scan(
+			&tg.ID,
+			&tg.Title,
+			&tg.Url); err != nil {
 			return nil, err
 		}
 
@@ -35,4 +50,3 @@ func (r *TgRepo) GetAllWithPagination(ctx context.Context, qe repository.Querier
 
 	return tgs, err
 }
-

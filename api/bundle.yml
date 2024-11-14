@@ -971,6 +971,10 @@ components:
           description: URL тг
           format: uri
           example: https://example.com
+      required:
+        - id
+        - title
+        - url
     ad:
       type: object
       properties:
@@ -1146,6 +1150,10 @@ components:
           type: integer
           description: Количество записей на странице
           example: 1
+      required:
+        - page
+        - pages
+        - per_page
     tgPost:
       type: object
       properties:

@@ -3,9 +3,8 @@ package tgRepo
 import (
 	"context"
 	"errors"
-	"fmt"
-	"strings"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
@@ -13,28 +12,34 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (r *TgRepo) Update(ctx context.Context, qe repository.Querier, id int, tg *entity.TGUpdate) (*entity.TGResp, error) {
-	var keys []string
-	var values []interface{}
-	if tg.Url != nil {
-		keys = append(keys, "url=$1")
-		values = append(values, tg.Url)
+func (r *TgRepo) Update(ctx context.Context, qe repository.Querier, id int, tg *entity.TgUpdate) (*entity.Tg, error) {
+	builder := squirrel.Update("tg").
+		Where(squirrel.Eq{"id": id}).
+		Suffix(`
+		returning 
+			id, 
+			title, 
+			url`).
+		PlaceholderFormat(squirrel.Dollar)
+
+	if tg.Url.Set {
+		builder = builder.Set("url", tg.Url.Value)
 	}
 
-	if tg.Title != nil {
-		keys = append(keys, fmt.Sprintf("title=$%d", len(values)+1))
-		values = append(values, tg.Title)
+	if tg.Title.Set {
+		builder = builder.Set("title", tg.Title.Value)
 	}
 
-	values = append(values, id)
-	query := fmt.Sprintf(`
-	update tg 
-		set %v 
-	where id = $%v
-	returning *;`, strings.Join(keys, ", "), len(values))
+	query, args, err := builder.ToSql()
+	if err != nil {
+		return nil, err
+	}
 
-	newTG := &entity.TGResp{}
-	err := qe.QueryRow(ctx, query, values...).Scan(&newTG.ID, &newTG.Title, &newTG.Url)
+	newTG := &entity.Tg{}
+	err = qe.QueryRow(ctx, query, args...).Scan(
+		&newTG.ID,
+		&newTG.Title,
+		&newTG.Url)
 
 	var pgErr *pgconn.PgError
 	switch {

@@ -19,15 +19,16 @@ func (h *Handler) V1AdminColorsIDPut(ctx context.Context, req *api.ColorPut, par
 		return &api.V1AdminColorsIDPutBadRequest{Message: "no changes"}, nil
 	}
 
-	Color, err := h.uc.Update(ctx, params.ID, newColor)
+	color, err := h.uc.Update(ctx, params.ID, newColor)
 	switch {
 	case errors.Is(err, repoerr.ErrColorNotFound):
 		return &api.V1AdminColorsIDPutNotFound{Message: err.Error()}, nil
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		return &api.V1AdminColorsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
+		h.log.Error(err)
 		return nil, err
 	}
 
-	return entity.ColorToApi(Color), nil
+	return entity.ColorToApi(color), nil
 }

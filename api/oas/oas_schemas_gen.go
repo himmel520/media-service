@@ -1458,40 +1458,40 @@ func (o OptV1AdsGetPriority) Or(d V1AdsGetPriority) V1AdsGetPriority {
 // Ref: #
 type Tg struct {
 	// Идентификатор тг.
-	ID OptInt `json:"id"`
+	ID int `json:"id"`
 	// Название тг.
-	Title OptString `json:"title"`
+	Title string `json:"title"`
 	// URL тг.
-	URL OptURI `json:"url"`
+	URL url.URL `json:"url"`
 }
 
 // GetID returns the value of ID.
-func (s *Tg) GetID() OptInt {
+func (s *Tg) GetID() int {
 	return s.ID
 }
 
 // GetTitle returns the value of Title.
-func (s *Tg) GetTitle() OptString {
+func (s *Tg) GetTitle() string {
 	return s.Title
 }
 
 // GetURL returns the value of URL.
-func (s *Tg) GetURL() OptURI {
+func (s *Tg) GetURL() url.URL {
 	return s.URL
 }
 
 // SetID sets the value of ID.
-func (s *Tg) SetID(val OptInt) {
+func (s *Tg) SetID(val int) {
 	s.ID = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Tg) SetTitle(val OptString) {
+func (s *Tg) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetURL sets the value of URL.
-func (s *Tg) SetURL(val OptURI) {
+func (s *Tg) SetURL(val url.URL) {
 	s.URL = val
 }
 
@@ -1558,11 +1558,11 @@ func (s *TgPut) SetURL(val OptURI) {
 type TgsResp struct {
 	Data []Tg `json:"data"`
 	// Текущая страница.
-	Page OptInt `json:"page"`
+	Page int `json:"page"`
 	// Количество страниц.
-	Pages OptInt `json:"pages"`
+	Pages int `json:"pages"`
 	// Количество записей на странице.
-	PerPage OptInt `json:"per_page"`
+	PerPage int `json:"per_page"`
 }
 
 // GetData returns the value of Data.
@@ -1571,17 +1571,17 @@ func (s *TgsResp) GetData() []Tg {
 }
 
 // GetPage returns the value of Page.
-func (s *TgsResp) GetPage() OptInt {
+func (s *TgsResp) GetPage() int {
 	return s.Page
 }
 
 // GetPages returns the value of Pages.
-func (s *TgsResp) GetPages() OptInt {
+func (s *TgsResp) GetPages() int {
 	return s.Pages
 }
 
 // GetPerPage returns the value of PerPage.
-func (s *TgsResp) GetPerPage() OptInt {
+func (s *TgsResp) GetPerPage() int {
 	return s.PerPage
 }
 
@@ -1591,17 +1591,17 @@ func (s *TgsResp) SetData(val []Tg) {
 }
 
 // SetPage sets the value of Page.
-func (s *TgsResp) SetPage(val OptInt) {
+func (s *TgsResp) SetPage(val int) {
 	s.Page = val
 }
 
 // SetPages sets the value of Pages.
-func (s *TgsResp) SetPages(val OptInt) {
+func (s *TgsResp) SetPages(val int) {
 	s.Pages = val
 }
 
 // SetPerPage sets the value of PerPage.
-func (s *TgsResp) SetPerPage(val OptInt) {
+func (s *TgsResp) SetPerPage(val int) {
 	s.PerPage = val
 }
 

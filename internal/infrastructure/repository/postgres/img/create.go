@@ -10,7 +10,21 @@ import (
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
-func (r *ImgRepo) Add(ctx context.Context, qe repository.Querier, logo *entity.Logo) (*entity.LogoResp, error) {
+func (r *ImgRepo) Create(ctx context.Context, qe repository.Querier, logo *entity.Logo) (*entity.LogoResp, error) {
+	query, args, err := squirrel.Insert("colors").
+		Columns(
+			"title",
+			"hex").
+		Values(
+			color.Title,
+			color.Hex).
+		PlaceholderFormat(squirrel.Dollar).
+		Suffix("returning id, title, hex").
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+	
 	newLogo := &entity.LogoResp{}
 
 	err := qe.QueryRow(ctx, `
