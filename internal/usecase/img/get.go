@@ -4,53 +4,37 @@ import (
 	"context"
 
 	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/repository"
+	"github.com/himmel520/media-service/internal/lib/paging"
+	"github.com/himmel520/media-service/internal/usecase"
 )
 
-func (uc *ImgUC) GetByID(ctx context.Context, id int) (*entity.LogoResp, error) {
+func (uc *ImgUC) GetByID(ctx context.Context, id int) (*entity.Image, error) {
 	// return uc.repo.GetByID(ctx, id)
 	return nil, nil
 }
 
-func (uc *ImgUC) GetAll(ctx context.Context) ([]*entity.LogoResp, error) {
-	// var logos []*entity.LogoResp
+func (uc *ImgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.ImagesResp, error) {
+	images, err := uc.repo.Get(ctx, uc.db.DB(), repository.PaginationParams{
+		Limit:  params.PerPage,
+		Offset: params.Page * params.PerPage})
+	if err != nil {
+		return nil, err
+	}
 
-	// logosStr, err := uc.cache.Get(ctx, allLogosCachekey)
-	// if err != nil {
-	// 	if !errors.Is(err, errcache.ErrKeyNotFound) {
-	// 		uc.log.Error(err)
-	// 	}
+	count, err := uc.repo.Count(ctx, uc.db.DB())
+	if err != nil {
+		return nil, err
+	}
 
-	// 	logos, err = uc.repo.GetAll(ctx)
-	// 	if err != nil {
-	// 		return nil, err
-	// 	}
-
-	// 	if err = uc.cache.Set(ctx, allLogosCachekey, logos); err != nil {
-	// 		uc.log.Error(err)
-	// 	}
-
-	// 	return logos, nil
-	// }
-
-	// err = json.Unmarshal([]byte(logosStr), &logos)
-	// return logos, err
-	return nil, nil
+	return &entity.ImagesResp{
+		Data:    images,
+		Page:    params.Page,
+		Pages:   paging.CalculatePages(count, params.PerPage),
+		PerPage: params.PerPage,
+	}, err
 }
 
-func (uc *ImgUC) GetAllWithPagination(ctx context.Context, limit, offset int) (*entity.LogosResp, error) {
-	// logos, err := uc.repo.GetAllWithPagination(ctx, limit, offset)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// count, err := uc.repo.Count(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// return &entity.LogosResp{
-	// 	Logos: logos,
-	// 	Total: count,
-	// }, err
-	return nil, nil
+func (uc *ImgUC) GetAllLogos(ctx context.Context) (entity.LogosResp, error) {
+	return uc.repo.GetAllLogos(ctx, uc.db.DB())
 }

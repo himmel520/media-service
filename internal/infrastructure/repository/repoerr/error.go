@@ -13,9 +13,9 @@ const (
 )
 
 var (
-	ErrLogoNotFound   = errors.New("logo not found")
-	ErrLogoExist      = errors.New("logo url must be unique")
-	ErrLogoDependency = errors.New("cannot delete object, it is linked to adv")
+	ErrImageNotFound   = errors.New("image not found")
+	ErrImageExist      = errors.New("image url must be unique")
+	ErrImageDependencyExist = errors.New("cannot delete object, it is linked to adv")
 )
 
 // Ошибки Color
@@ -34,6 +34,6 @@ var (
 
 // Ошибки Adv
 var (
-	ErrAdvDependencyNotExist = errors.New("cannot add or update adv because there is no record reference to color, logo or tg")
+	ErrAdvDependencyNotExist = errors.New("cannot add or update adv because there is no record reference to color, Image or tg")
 	ErrAdvNotFound           = errors.New("adv not found")
 )

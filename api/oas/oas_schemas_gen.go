@@ -634,52 +634,52 @@ func (s *ErrorStatusCode) SetResponse(val Error) {
 // Ref: #
 type Image struct {
 	// Идентификатор изображения.
-	ID OptInt `json:"id"`
+	ID int `json:"id"`
 	// Название изображения.
-	Title OptString `json:"title"`
+	Title string `json:"title"`
 	// URL изображения.
-	URL OptURI `json:"url"`
+	URL url.URL `json:"url"`
 	// Тип изображения (например, 'adv' или 'logo').
-	Type OptImageType `json:"type"`
+	Type ImageType `json:"type"`
 }
 
 // GetID returns the value of ID.
-func (s *Image) GetID() OptInt {
+func (s *Image) GetID() int {
 	return s.ID
 }
 
 // GetTitle returns the value of Title.
-func (s *Image) GetTitle() OptString {
+func (s *Image) GetTitle() string {
 	return s.Title
 }
 
 // GetURL returns the value of URL.
-func (s *Image) GetURL() OptURI {
+func (s *Image) GetURL() url.URL {
 	return s.URL
 }
 
 // GetType returns the value of Type.
-func (s *Image) GetType() OptImageType {
+func (s *Image) GetType() ImageType {
 	return s.Type
 }
 
 // SetID sets the value of ID.
-func (s *Image) SetID(val OptInt) {
+func (s *Image) SetID(val int) {
 	s.ID = val
 }
 
 // SetTitle sets the value of Title.
-func (s *Image) SetTitle(val OptString) {
+func (s *Image) SetTitle(val string) {
 	s.Title = val
 }
 
 // SetURL sets the value of URL.
-func (s *Image) SetURL(val OptURI) {
+func (s *Image) SetURL(val url.URL) {
 	s.URL = val
 }
 
 // SetType sets the value of Type.
-func (s *Image) SetType(val OptImageType) {
+func (s *Image) SetType(val ImageType) {
 	s.Type = val
 }
 
@@ -896,11 +896,11 @@ func (s *ImageType) UnmarshalText(data []byte) error {
 type ImagesResp struct {
 	Data []Image `json:"data"`
 	// Текущая страница.
-	Page OptInt `json:"page"`
+	Page int `json:"page"`
 	// Количество страниц.
-	Pages OptInt `json:"pages"`
+	Pages int `json:"pages"`
 	// Количество записей на странице.
-	PerPage OptInt `json:"per_page"`
+	PerPage int `json:"per_page"`
 }
 
 // GetData returns the value of Data.
@@ -909,17 +909,17 @@ func (s *ImagesResp) GetData() []Image {
 }
 
 // GetPage returns the value of Page.
-func (s *ImagesResp) GetPage() OptInt {
+func (s *ImagesResp) GetPage() int {
 	return s.Page
 }
 
 // GetPages returns the value of Pages.
-func (s *ImagesResp) GetPages() OptInt {
+func (s *ImagesResp) GetPages() int {
 	return s.Pages
 }
 
 // GetPerPage returns the value of PerPage.
-func (s *ImagesResp) GetPerPage() OptInt {
+func (s *ImagesResp) GetPerPage() int {
 	return s.PerPage
 }
 
@@ -929,25 +929,109 @@ func (s *ImagesResp) SetData(val []Image) {
 }
 
 // SetPage sets the value of Page.
-func (s *ImagesResp) SetPage(val OptInt) {
+func (s *ImagesResp) SetPage(val int) {
 	s.Page = val
 }
 
 // SetPages sets the value of Pages.
-func (s *ImagesResp) SetPages(val OptInt) {
+func (s *ImagesResp) SetPages(val int) {
 	s.Pages = val
 }
 
 // SetPerPage sets the value of PerPage.
-func (s *ImagesResp) SetPerPage(val OptInt) {
+func (s *ImagesResp) SetPerPage(val int) {
 	s.PerPage = val
 }
 
 func (*ImagesResp) v1AdminImagesGetRes() {}
 
-type LogosResp []Image
+// Ref: #
+type LogosResp map[string]LogosRespItem
+
+func (s *LogosResp) init() LogosResp {
+	m := *s
+	if m == nil {
+		m = map[string]LogosRespItem{}
+		*s = m
+	}
+	return m
+}
 
 func (*LogosResp) v1LogosGetRes() {}
+
+type LogosRespItem struct {
+	// Название элемента.
+	Title string `json:"title"`
+	// URL элемента.
+	URL url.URL `json:"url"`
+	// Тип элемента (например, логотип).
+	Type LogosRespItemType `json:"type"`
+}
+
+// GetTitle returns the value of Title.
+func (s *LogosRespItem) GetTitle() string {
+	return s.Title
+}
+
+// GetURL returns the value of URL.
+func (s *LogosRespItem) GetURL() url.URL {
+	return s.URL
+}
+
+// GetType returns the value of Type.
+func (s *LogosRespItem) GetType() LogosRespItemType {
+	return s.Type
+}
+
+// SetTitle sets the value of Title.
+func (s *LogosRespItem) SetTitle(val string) {
+	s.Title = val
+}
+
+// SetURL sets the value of URL.
+func (s *LogosRespItem) SetURL(val url.URL) {
+	s.URL = val
+}
+
+// SetType sets the value of Type.
+func (s *LogosRespItem) SetType(val LogosRespItemType) {
+	s.Type = val
+}
+
+// Тип элемента (например, логотип).
+type LogosRespItemType string
+
+const (
+	LogosRespItemTypeLogo LogosRespItemType = "logo"
+)
+
+// AllValues returns all LogosRespItemType values.
+func (LogosRespItemType) AllValues() []LogosRespItemType {
+	return []LogosRespItemType{
+		LogosRespItemTypeLogo,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s LogosRespItemType) MarshalText() ([]byte, error) {
+	switch s {
+	case LogosRespItemTypeLogo:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *LogosRespItemType) UnmarshalText(data []byte) error {
+	switch LogosRespItemType(data) {
+	case LogosRespItemTypeLogo:
+		*s = LogosRespItemTypeLogo
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
 
 // NewOptAdPriority returns new OptAdPriority with value set to v.
 func NewOptAdPriority(v AdPriority) OptAdPriority {
@@ -1173,52 +1257,6 @@ func (o OptImagePutType) Get() (v ImagePutType, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptImagePutType) Or(d ImagePutType) ImagePutType {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptImageType returns new OptImageType with value set to v.
-func NewOptImageType(v ImageType) OptImageType {
-	return OptImageType{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptImageType is optional ImageType.
-type OptImageType struct {
-	Value ImageType
-	Set   bool
-}
-
-// IsSet returns true if OptImageType was set.
-func (o OptImageType) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptImageType) Reset() {
-	var v ImageType
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptImageType) SetTo(v ImageType) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptImageType) Get() (v ImageType, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptImageType) Or(d ImageType) ImageType {
 	if v, ok := o.Get(); ok {
 		return v
 	}

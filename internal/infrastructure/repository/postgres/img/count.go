@@ -8,6 +8,6 @@ import (
 
 func (r *ImgRepo) Count(ctx context.Context, qe repository.Querier) (int, error) {
 	var count int
-	err := qe.QueryRow(ctx, `SELECT COUNT(*) FROM logos;`).Scan(&count)
+	err := qe.QueryRow(ctx, `SELECT COUNT(*) FROM images`).Scan(&count)
 	return count, err
 }

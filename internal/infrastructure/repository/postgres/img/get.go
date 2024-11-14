@@ -2,78 +2,96 @@ package imgRepo
 
 import (
 	"context"
-	"errors"
+	"strconv"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
-	"github.com/jackc/pgx/v5"
 )
 
-func (r *ImgRepo) GetByID(ctx context.Context, qe repository.Querier, id int) (*entity.LogoResp, error) {
-	logo := &entity.LogoResp{}
-
-	err := qe.QueryRow(ctx, `
-	select * from logos 
-		where id = $1;`, id).Scan(&logo.ID, &logo.Url, &logo.Title)
-	if errors.Is(err, pgx.ErrNoRows) {
-		return nil, repoerr.ErrLogoNotFound
+func (r *ImgRepo) Get(ctx context.Context, qe repository.Querier, params repository.PaginationParams) ([]*entity.Image, error) {
+	query, args, err := squirrel.
+		Select(
+			"id",
+			"url",
+			"title",
+			"type").
+		From("images").
+		OrderBy("title").
+		Limit(params.Limit).
+		Offset(params.Offset).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, err
 	}
 
-	return logo, err
-}
-
-func (r *ImgRepo) GetAll(ctx context.Context, qe repository.Querier) ([]*entity.LogoResp, error) {
-	rows, err := qe.Query(ctx, `
-	select * 
-		from logos
-	order by title asc`)
+	rows, err := qe.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	logos := []*entity.LogoResp{}
+	images := []*entity.Image{}
 	for rows.Next() {
-		logo := &entity.LogoResp{}
-		if err := rows.Scan(&logo.ID, &logo.Url, &logo.Title); err != nil {
+		image := &entity.Image{}
+		if err := rows.Scan(
+			&image.ID,
+			&image.Url,
+			&image.Title,
+			&image.Type); err != nil {
 			return nil, err
 		}
 
-		logos = append(logos, logo)
+		images = append(images, image)
 	}
 
-	if len(logos) == 0 {
-		return nil, repoerr.ErrLogoNotFound
+	if len(images) == 0 {
+		return nil, repoerr.ErrImageNotFound
 	}
 
-	return logos, err
+	return images, err
 }
 
-func (r *ImgRepo) GetAllWithPagination(ctx context.Context, qe repository.Querier, limit, offset int) (map[int]*entity.Logo, error) {
-	rows, err := qe.Query(ctx, `
-	select * 
-		from logos
-	order by title asc
-	limit $1 offset $2`, limit, offset)
+func (r *ImgRepo) GetAllLogos(ctx context.Context, qe repository.Querier) (entity.LogosResp, error) {
+	query, args, err := squirrel.
+		Select(
+			"id",
+			"url",
+			"title",
+			"type").
+		From("images").
+		OrderBy("title").Where(squirrel.Eq{"type": "logo"}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := qe.Query(ctx, query, args...)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	logos := map[int]*entity.Logo{}
+	images := entity.LogosResp{}
 	for rows.Next() {
-		logo := &entity.Logo{}
-		if err := rows.Scan(&logo.ID, &logo.Url, &logo.Title); err != nil {
+		image := &entity.Image{}
+		if err := rows.Scan(
+			&image.ID,
+			&image.Url,
+			&image.Title,
+			&image.Type); err != nil {
 			return nil, err
 		}
 
-		logos[logo.ID] = logo
+		images[strconv.Itoa(image.ID)] = image
 	}
 
-	if len(logos) == 0 {
-		return nil, repoerr.ErrLogoNotFound
+	if len(images) == 0 {
+		return nil, repoerr.ErrImageNotFound
 	}
 
-	return logos, err
+	return images, err
 }
