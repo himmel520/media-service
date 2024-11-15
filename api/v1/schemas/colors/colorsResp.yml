@@ -20,4 +20,7 @@ properties:
     type: integer
     description: Количество записей на странице
     example: 1
-
+required:
+  - page
+  - pages
+  - per_page

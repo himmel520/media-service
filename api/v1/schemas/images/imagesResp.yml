@@ -4,11 +4,6 @@ properties:
     type: array
     items:
       $ref: "./image.yml"
-    example:
-      - id: 1
-        title: "Логотип компании"
-        url: "https://example.com/logo.png"
-        type: "logo"
   page:
     type: integer
     description: Текущая страница
@@ -21,3 +16,7 @@ properties:
     type: integer
     description: Количество записей на странице
     example: 20
+required:
+  - page
+  - pages
+  - per_page

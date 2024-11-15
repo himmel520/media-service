@@ -1,7 +1,6 @@
-package usecase
+package authUC
 
 import (
-	"crypto/rsa"
 	"errors"
 	"fmt"
 
@@ -9,15 +8,7 @@ import (
 	"github.com/himmel520/media-service/internal/entity"
 )
 
-type AuthUsecase struct {
-	publicKey rsa.PublicKey
-}
-
-func NewAuthUsecase(publicKey rsa.PublicKey) *AuthUsecase {
-	return &AuthUsecase{publicKey: publicKey}
-}
-
-func (uc *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
+func (uc *AuthUC) GetUserRoleFromToken(jwtToken string) (string, error) {
 	token, err := jwt.Parse(jwtToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("unexpected signing method")
@@ -41,6 +32,6 @@ func (uc *AuthUsecase) GetUserRoleFromToken(jwtToken string) (string, error) {
 	return role, err
 }
 
-func (uc *AuthUsecase) IsUserAdmin(userRole string) bool {
+func (uc *AuthUC) IsUserAdmin(userRole string) bool {
 	return userRole == entity.RoleAdmin
 }

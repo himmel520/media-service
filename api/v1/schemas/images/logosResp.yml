@@ -1,8 +1,23 @@
-type: array
-items:
-  $ref: "./image.yml"
-example:
-  - id: 1
-    title: "Логотип компании"
-    url: "https://example.com/logo.png"
-    type: "logo"
+type: object
+additionalProperties:
+  type: object
+  properties:
+    title:
+      type: string
+      example: go_normal
+      description: Название элемента
+    url:
+      type: string
+      format: uri
+      example: http://url.example2.com
+      description: URL элемента
+    type:
+      type: string
+      enum:
+        - logo
+      example: logo
+      description: Тип элемента (например, логотип)
+  required:
+    - title
+    - url 
+    - type

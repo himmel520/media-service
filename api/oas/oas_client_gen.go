@@ -2229,12 +2229,21 @@ func (c *Client) sendV1AdsGet(ctx context.Context, params V1AdsGetParams) (res V
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "priority",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Priority.Get(); ok {
-				return e.EncodeValue(conv.IntToString(int(val)))
+			if params.Priority != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Priority {
+						if err := func() error {
+							return e.EncodeValue(conv.IntToString(int(item)))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
 			}
 			return nil
 		}); err != nil {
@@ -2246,12 +2255,21 @@ func (c *Client) sendV1AdsGet(ctx context.Context, params V1AdsGetParams) (res V
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "post",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Post.Get(); ok {
-				return e.EncodeValue(conv.StringToString(val))
+			if params.Post != nil {
+				return e.EncodeArray(func(e uri.Encoder) error {
+					for i, item := range params.Post {
+						if err := func() error {
+							return e.EncodeValue(conv.StringToString(item))
+						}(); err != nil {
+							return errors.Wrapf(err, "[%d]", i)
+						}
+					}
+					return nil
+				})
 			}
 			return nil
 		}); err != nil {

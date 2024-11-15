@@ -3,6 +3,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 
@@ -49,7 +50,7 @@ func decodeV1AdminAdsGetParams(args [0]string, argsEscaped bool, r *http.Request
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Set default value for query: page.
 	{
-		val := int(1)
+		val := int(0)
 		params.Page.SetTo(val)
 	}
 	// Decode query: page.
@@ -1198,9 +1199,9 @@ func decodeV1AdminTgsIDPutParams(args [1]string, argsEscaped bool, r *http.Reque
 // V1AdsGetParams is parameters of GET /v1/ads operation.
 type V1AdsGetParams struct {
 	// Фильтр по приоритету.
-	Priority OptV1AdsGetPriority
-	// Фильтр по должности (например, "Golang").
-	Post OptString
+	Priority []V1AdsGetPriorityItem
+	// Фильтр по должности.
+	Post []string
 }
 
 func unpackV1AdsGetParams(packed middleware.Parameters) (params V1AdsGetParams) {
@@ -1210,7 +1211,7 @@ func unpackV1AdsGetParams(packed middleware.Parameters) (params V1AdsGetParams) 
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Priority = v.(OptV1AdsGetPriority)
+			params.Priority = v.([]V1AdsGetPriorityItem)
 		}
 	}
 	{
@@ -1219,7 +1220,7 @@ func unpackV1AdsGetParams(packed middleware.Parameters) (params V1AdsGetParams) 
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Post = v.(OptString)
+			params.Post = v.([]string)
 		}
 	}
 	return params
@@ -1232,43 +1233,52 @@ func decodeV1AdsGetParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 		cfg := uri.QueryParameterDecodingConfig{
 			Name:    "priority",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPriorityVal V1AdsGetPriority
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
-						return err
-					}
-
-					c, err := conv.ToInt(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPriorityVal = V1AdsGetPriority(c)
-					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Priority.SetTo(paramsDotPriorityVal)
-				return nil
-			}); err != nil {
-				return err
-			}
-			if err := func() error {
-				if value, ok := params.Priority.Get(); ok {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPriorityVal V1AdsGetPriorityItem
 					if err := func() error {
-						if err := value.Validate(); err != nil {
+						val, err := d.DecodeValue()
+						if err != nil {
 							return err
 						}
+
+						c, err := conv.ToInt(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPriorityVal = V1AdsGetPriorityItem(c)
 						return nil
 					}(); err != nil {
 						return err
 					}
+					params.Priority = append(params.Priority, paramsDotPriorityVal)
+					return nil
+				})
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				var failures []validate.FieldError
+				for i, elem := range params.Priority {
+					if err := func() error {
+						if err := elem.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						failures = append(failures, validate.FieldError{
+							Name:  fmt.Sprintf("[%d]", i),
+							Error: err,
+						})
+					}
+				}
+				if len(failures) > 0 {
+					return &validate.Error{Fields: failures}
 				}
 				return nil
 			}(); err != nil {
@@ -1288,30 +1298,32 @@ func decodeV1AdsGetParams(args [0]string, argsEscaped bool, r *http.Request) (pa
 		cfg := uri.QueryParameterDecodingConfig{
 			Name:    "post",
 			Style:   uri.QueryStyleForm,
-			Explode: true,
+			Explode: false,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotPostVal string
-				if err := func() error {
-					val, err := d.DecodeValue()
-					if err != nil {
+				return d.DecodeArray(func(d uri.Decoder) error {
+					var paramsDotPostVal string
+					if err := func() error {
+						val, err := d.DecodeValue()
+						if err != nil {
+							return err
+						}
+
+						c, err := conv.ToString(val)
+						if err != nil {
+							return err
+						}
+
+						paramsDotPostVal = c
+						return nil
+					}(); err != nil {
 						return err
 					}
-
-					c, err := conv.ToString(val)
-					if err != nil {
-						return err
-					}
-
-					paramsDotPostVal = c
+					params.Post = append(params.Post, paramsDotPostVal)
 					return nil
-				}(); err != nil {
-					return err
-				}
-				params.Post.SetTo(paramsDotPostVal)
-				return nil
+				})
 			}); err != nil {
 				return err
 			}

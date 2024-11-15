@@ -6,6 +6,12 @@ import (
 	api "github.com/himmel520/media-service/api/oas"
 )
 
+// Default pagination
+const (
+	Page = 0
+	PerPage = 20
+)
+
 type (
 	Handler struct {
 		Auth
