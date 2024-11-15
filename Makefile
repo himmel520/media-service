@@ -18,9 +18,6 @@ generate.api: $(ogen)
 	$(ogen) --loglevel error --clean --config .ogen.yml --target ./api/oas ./api/openapi.yml
 	docker run --rm -v `pwd`:/spec redocly/cli bundle ./api/openapi.yml > ./api/bundle.yml
 
-.PHONY: run
-run:
-	go run cmd/main.go
 
 # COMPOSE
 .PHONY: compose.up
@@ -34,7 +31,7 @@ compose.down:
 # MIGRATION
 .PHONY: migrate.create
 migrate.create: $(migrate)
-	$(migrate) create -ext sql -dir migrations $(name) 
+	$(migrate) create -ext sql -dir migrations $(name)
 
 .PHONY: migrate.up
 migrate.up:

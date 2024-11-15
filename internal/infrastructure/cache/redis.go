@@ -1,11 +1,10 @@
-package redis
+package cache
 
 import (
 	"context"
 	"encoding/json"
 	"time"
 
-	"github.com/himmel520/media-service/internal/infrastructure/cache/errcache"
 	goredis "github.com/redis/go-redis/v9"
 )
 
@@ -22,16 +21,16 @@ func NewRedis(conn string) (*goredis.Client, error) {
 	return rdb, err
 }
 
-type Cache struct {
+type Redis struct {
 	rdb *goredis.Client
 	exp time.Duration
 }
 
-func NewCache(db *goredis.Client, exp time.Duration) *Cache {
-	return &Cache{rdb: db, exp: exp}
+func NewCache(db *goredis.Client, exp time.Duration) *Redis {
+	return &Redis{rdb: db, exp: exp}
 }
 
-func (r *Cache) Set(ctx context.Context, key string, value any) error {
+func (r *Redis) Set(ctx context.Context, key string, value any) error {
 	byte, err := json.Marshal(value)
 	if err != nil {
 		return err
@@ -41,19 +40,16 @@ func (r *Cache) Set(ctx context.Context, key string, value any) error {
 	return err
 }
 
-func (r *Cache) Get(ctx context.Context, key string) (string, error) {
+func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
-		if err == goredis.Nil {
-			return "", errcache.ErrKeyNotFound
-		}
 		return "", err
 	}
 
 	return val, err
 }
 
-func (r *Cache) Delete(ctx context.Context, prefix string) error {
+func (r *Redis) Delete(ctx context.Context, prefix string) error {
 	keys, err := r.rdb.Keys(ctx, prefix).Result()
 	if err != nil {
 		return err
