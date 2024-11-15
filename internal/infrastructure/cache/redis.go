@@ -43,6 +43,7 @@ func (r *Redis) Set(ctx context.Context, key string, value any) error {
 func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
+
 		if err == goredis.Nil {
 			return "", ErrKeyNotFound
 		}

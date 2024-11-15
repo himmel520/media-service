@@ -22,7 +22,6 @@ import (
 	tgUC "github.com/himmel520/media-service/internal/usecase/tg"
 
 	"github.com/himmel520/media-service/internal/infrastructure/cache"
-	"github.com/himmel520/media-service/internal/infrastructure/cache/redis"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/postgres"
 	adRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/ad"
@@ -59,13 +58,13 @@ func main() {
 	dbtx := repository.NewDBTX(pool)
 
 	// cache
-	rdb, err := redis.NewRedis(cfg.Cache.Conn)
+	rdb, err := cache.NewRedis(cfg.Cache.Conn)
 	if err != nil {
 		log.Fatalf("unable to connect to cache: %v", err)
 	}
 	defer rdb.Close()
 
-	cache := cache.New(rdb, cfg.Cache.Exp)
+	cache := cache.Init(rdb, cfg.Cache.Exp)
 	// repo := repository.New(db)
 	// usecase := usecase.New(repo, cache, , log)
 

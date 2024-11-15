@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/himmel520/media-service/internal/infrastructure/cache/redis"
 	goredis "github.com/redis/go-redis/v9"
 )
 
@@ -16,6 +15,6 @@ type Cache interface {
 	Delete(ctx context.Context, prefix string) error
 }
 
-func New(rdb *goredis.Client, exp time.Duration) Cache {
-	return redis.NewCache(rdb, exp)
+func Init(rdb *goredis.Client, exp time.Duration) Cache {
+	return NewCache(rdb, exp)
 }
