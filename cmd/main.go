@@ -28,7 +28,7 @@ import (
 	colorRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/color"
 	imgRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/img"
 	tgRepo "github.com/himmel520/media-service/internal/infrastructure/repository/postgres/tg"
-	"github.com/himmel520/media-service/pkg/print"
+	"github.com/himmel520/media-service/pkg/log"
 )
 
 // @title API Documentation
@@ -42,7 +42,7 @@ func main() {
 	logLevel := flag.String("loglevel", "info", "log level: debug, info, warn, error")
 	flag.Parse()
 
-	log := print.SetupLogger(*logLevel)
+	log := log.SetupLogger(*logLevel)
 
 	cfg, err := config.New()
 	if err != nil {

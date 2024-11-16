@@ -7,7 +7,7 @@ import (
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
-	"github.com/himmel520/media-service/pkg/print"
+	"github.com/himmel520/media-service/pkg/log"
 )
 
 func (h *Handler) V1AdminTgsPost(ctx context.Context, req *api.TgPost) (api.V1AdminTgsPostRes, error) {
@@ -24,7 +24,9 @@ func (h *Handler) V1AdminTgsPost(ctx context.Context, req *api.TgPost) (api.V1Ad
 		// мне так захотелось сделать чтобы избавить хэндлеры от лога в структуре
 		// запись можно сократить например до log.Log.Error (это лютая привычка но я бы назвал не принт а console)
 		// что бы было console.Log, но это глупо)
-		print.Logger.Error(err)
+		// print.Logger.Error(err)
+		log.Info(err)
+		log.Error(err)
 		// h.log.Error(err)
 		return nil, err
 	}

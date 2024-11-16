@@ -1,4 +1,4 @@
-package print
+package log
 
 import (
 	"fmt"
@@ -32,4 +32,20 @@ func SetupLogger(level string) *logrus.Logger {
 	Logger.Level = lvl
 
 	return Logger
+}
+
+func Info(args ...interface{}) {
+	Logger.Info(args...)
+}
+
+func Infof(format string, args ...interface{}) {
+	Logger.Infof(format, args...)
+}
+
+func Error(args ...interface{}) {
+	Logger.Error(args...)
+}
+
+func Errorf(format string, args ...interface{}) {
+	Logger.Errorf(format, args...)
 }
