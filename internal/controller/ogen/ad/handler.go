@@ -11,7 +11,6 @@ import (
 type (
 	Handler struct {
 		uc  AdUsecase
-		log *logrus.Logger
 	}
 
 	AdUsecase interface {
@@ -23,9 +22,8 @@ type (
 	}
 )
 
-func New(uc AdUsecase, log *logrus.Logger) *Handler {
+func New(uc AdUsecase) *Handler {
 	return &Handler{
 		uc:  uc,
-		log: log,
 	}
 }

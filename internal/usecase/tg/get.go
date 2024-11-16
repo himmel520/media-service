@@ -2,6 +2,7 @@ package tgUC
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
@@ -14,12 +15,12 @@ func (uc *TgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Tgs
 		Limit:  params.PerPage,
 		Offset: params.Page * params.PerPage})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo get: %w", err)
 	}
 
 	count, err := uc.repo.Count(ctx, uc.db.DB())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo count: %w", err)
 	}
 
 	return &entity.TgsResp{

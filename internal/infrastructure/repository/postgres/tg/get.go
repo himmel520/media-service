@@ -2,6 +2,7 @@ package tgRepo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
@@ -22,12 +23,12 @@ func (r *TgRepo) Get(ctx context.Context, qe repository.Querier, params reposito
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("build query: %w", err)
 	}
 
 	rows, err := qe.Query(ctx, query, args...)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("query row: %w", err)
 	}
 	defer rows.Close()
 
@@ -38,7 +39,7 @@ func (r *TgRepo) Get(ctx context.Context, qe repository.Querier, params reposito
 			&tg.ID,
 			&tg.Title,
 			&tg.Url); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan row: %w", err)
 		}
 
 		tgs = append(tgs, tg)

@@ -6,6 +6,7 @@ import (
 
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	"github.com/himmel520/media-service/pkg/log"
 )
 
 func (h *Handler) V1AdminAdsIDDelete(ctx context.Context, params api.V1AdminAdsIDDeleteParams) (api.V1AdminAdsIDDeleteRes, error) {
@@ -15,7 +16,7 @@ func (h *Handler) V1AdminAdsIDDelete(ctx context.Context, params api.V1AdminAdsI
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		return &api.V1AdminAdsIDDeleteNotFound{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Error(err)
 		return nil, err
 	}
 
