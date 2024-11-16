@@ -12,6 +12,7 @@ import (
 type Cache interface {
 	Set(ctx context.Context, key string, value any) error
 	Get(ctx context.Context, key string) (string, error)
+	GetAll(ctx context.Context, prefix string) ([]string, error)
 	Delete(ctx context.Context, prefix string) error
 }
 

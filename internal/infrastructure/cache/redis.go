@@ -53,6 +53,24 @@ func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	return val, err
 }
 
+func (r *Redis) GetAll(ctx context.Context, prefix string) ([]string, error) {
+	keys, err := r.rdb.Keys(ctx, prefix).Result()
+	if err != nil {
+		return []string{}, err
+	}
+
+	res := make([]string, 0, len(keys))
+	for _, key := range keys {
+		val, err := r.rdb.Get(ctx, key).Result()
+		if err != nil {
+			return []string{}, err
+		}
+		res = append(res, val)
+	}
+
+	return res, err
+}
+
 func (r *Redis) Delete(ctx context.Context, prefix string) error {
 	keys, err := r.rdb.Keys(ctx, prefix).Result()
 	if err != nil {

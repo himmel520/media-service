@@ -2,7 +2,9 @@ package imgUC
 
 import (
 	"context"
+	"encoding/json"
 
+	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/lib/paging"
@@ -36,5 +38,21 @@ func (uc *ImgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Im
 }
 
 func (uc *ImgUC) GetAllLogos(ctx context.Context) (entity.LogosResp, error) {
-	return uc.repo.GetAllLogos(ctx, uc.db.DB())
+	bytes, err := uc.cache.GetAll(ctx, logoCachePrefix)
+	if err != nil {
+		return nil, err
+
+	}
+	res := make(entity.LogosResp, len(bytes))
+	for _, val := range bytes {
+		var logo api.LogosRespItem
+		err := json.Unmarshal([]byte(val), &logo)
+		if err != nil {
+			return nil, err
+		}
+		res[logo.ID] = logo
+	}
+
+	return res
+	// return uc.repo.GetAllLogos(ctx, uc.db.DB())
 }
