@@ -43,25 +43,6 @@ func ImageToLogoItemApi(i *Image) *api.LogosRespItem {
 	}
 }
 
-type LogosResp map[string]*Image
-
-func LogosRespToApi(logos LogosResp) *api.LogosResp {
-	apiLogos := api.LogosResp{}
-
-	for id, logo := range logos {
-		url, _ := url.Parse(logo.Url)
-
-		apiLogos[id] = api.LogosRespItem{
-			Title: logo.Title,
-			URL:   *url,
-			// TODO: добавить проверку на тип
-			Type:  api.LogosRespItemType(logo.Type),
-		}
-	}
-
-	return &apiLogos
-}
-
 type ImagesResp struct {
 	Data    []*Image `json:"data"`
 	Page    uint64   `json:"page"`

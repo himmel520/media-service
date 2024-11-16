@@ -75,23 +75,23 @@ func (r *ImgRepo) GetAllLogos(ctx context.Context, qe repository.Querier) (entit
 	}
 	defer rows.Close()
 
-	images := entity.LogosResp{}
+	logos := entity.LogosResp{}
 	for rows.Next() {
-		image := &entity.Image{}
+		logo := &entity.Logo{}
 		if err := rows.Scan(
-			&image.ID,
-			&image.Url,
-			&image.Title,
-			&image.Type); err != nil {
+			&logo.ID,
+			&logo.Url,
+			&logo.Title,
+			&logo.Type); err != nil {
 			return nil, err
 		}
 
-		images[strconv.Itoa(image.ID)] = image
+		logos[strconv.Itoa(logo.ID)] = logo
 	}
 
-	if len(images) == 0 {
+	if len(logos) == 0 {
 		return nil, repoerr.ErrImageNotFound
 	}
 
-	return images, err
+	return logos, err
 }

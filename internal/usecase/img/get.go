@@ -3,9 +3,10 @@ package imgUC
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
-	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/lib/paging"
 	"github.com/himmel520/media-service/internal/usecase"
@@ -38,21 +39,26 @@ func (uc *ImgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Im
 }
 
 func (uc *ImgUC) GetAllLogos(ctx context.Context) (entity.LogosResp, error) {
-	bytes, err := uc.cache.GetAll(ctx, logoCachePrefix)
-	if err != nil {
-		return nil, err
+	var logos entity.LogosResp
 
-	}
-	res := make(entity.LogosResp, len(bytes))
-	for _, val := range bytes {
-		var logo api.LogosRespItem
-		err := json.Unmarshal([]byte(val), &logo)
+	bytes, err := uc.cache.Get(ctx, allLogosCachekey)
+	if err != nil {
+		if !errors.Is(err, cache.ErrKeyNotFound) {
+			uc.log.Error(err)
+		}
+
+		logos, err := uc.repo.GetAllLogos(ctx, uc.db.DB())
 		if err != nil {
 			return nil, err
 		}
-		res[logo.ID] = logo
+
+		if err = uc.cache.Set(ctx, allLogosCachekey, logos); err != nil {
+			uc.log.Error(err)
+		}
+
+		return logos, nil
 	}
 
-	return res
-	// return uc.repo.GetAllLogos(ctx, uc.db.DB())
+	err = json.Unmarshal([]byte(bytes), &logos)
+	return logos, err
 }
