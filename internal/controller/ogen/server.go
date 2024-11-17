@@ -26,6 +26,7 @@ func NewServer(h *Handler, addr string) (*Server, error) {
 	}
 
 	mux := chi.NewMux()
+	mux.Use(SetCors())
 	mux.Use(middleware.RequestID)
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
