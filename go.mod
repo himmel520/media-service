@@ -42,6 +42,7 @@ require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-chi/chi v1.5.5
+	github.com/go-chi/cors v1.2.1
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jackc/pgx/v5 v5.7.1
