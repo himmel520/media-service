@@ -5,13 +5,11 @@ import (
 	"crypto/rsa"
 
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
-	"github.com/sirupsen/logrus"
 )
 
 type (
 	AuthUC struct {
 		publicKey rsa.PublicKey
-		log       *logrus.Logger
 	}
 
 	DBXT interface {
@@ -20,9 +18,8 @@ type (
 	}
 )
 
-func New(publicKey rsa.PublicKey, log *logrus.Logger) *AuthUC {
+func New(publicKey rsa.PublicKey) *AuthUC {
 	return &AuthUC{
 		publicKey: publicKey,
-		log:   log,
 	}
 }

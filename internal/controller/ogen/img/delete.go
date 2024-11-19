@@ -6,6 +6,7 @@ import (
 
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminImagesIDDelete(ctx context.Context, params api.V1AdminImagesIDDeleteParams) (api.V1AdminImagesIDDeleteRes, error) {
@@ -16,7 +17,7 @@ func (h *Handler) V1AdminImagesIDDelete(ctx context.Context, params api.V1AdminI
 	case errors.Is(err, repoerr.ErrImageDependencyExist):
 		return &api.V1AdminImagesIDDeleteConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 	

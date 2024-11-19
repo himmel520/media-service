@@ -6,7 +6,6 @@ import (
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/cache"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
-	"github.com/sirupsen/logrus"
 )
 
 type (
@@ -14,7 +13,6 @@ type (
 		db    DBXT
 		repo  ImgRepo
 		cache cache.Cache
-		log   *logrus.Logger
 	}
 
 	DBXT interface {
@@ -32,6 +30,6 @@ type (
 	}
 )
 
-func New(db DBXT, repo ImgRepo, cache cache.Cache, log *logrus.Logger) *ImgUC {
+func New(db DBXT, repo ImgRepo, cache cache.Cache) *ImgUC {
 	return &ImgUC{db: db, repo: repo}
 }

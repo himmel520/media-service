@@ -7,7 +7,7 @@ import (
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
-	"github.com/himmel520/media-service/pkg/log"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminAdsPost(ctx context.Context, req *api.AdPost) (api.V1AdminAdsPostRes, error) {
@@ -25,7 +25,7 @@ func (h *Handler) V1AdminAdsPost(ctx context.Context, req *api.AdPost) (api.V1Ad
 	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
 		return &api.V1AdminAdsPostConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 

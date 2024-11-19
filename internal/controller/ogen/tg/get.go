@@ -8,6 +8,7 @@ import (
 	"github.com/himmel520/media-service/internal/controller/ogen"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
 	"github.com/himmel520/media-service/internal/usecase"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminTgsGet(ctx context.Context, params api.V1AdminTgsGetParams) (api.V1AdminTgsGetRes, error) {
@@ -20,7 +21,7 @@ func (h *Handler) V1AdminTgsGet(ctx context.Context, params api.V1AdminTgsGetPar
 	case errors.Is(err, repoerr.ErrTGNotFound):
 		return &api.V1AdminTgsGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 
