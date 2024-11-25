@@ -5,13 +5,11 @@ import (
 
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/usecase"
-	"github.com/sirupsen/logrus"
 )
 
 type (
 	Handler struct {
-		uc  AdUsecase
-		log *logrus.Logger
+		uc AdUsecase
 	}
 
 	AdUsecase interface {
@@ -23,9 +21,8 @@ type (
 	}
 )
 
-func New(uc AdUsecase, log *logrus.Logger) *Handler {
+func New(uc AdUsecase) *Handler {
 	return &Handler{
-		uc:  uc,
-		log: log,
+		uc: uc,
 	}
 }

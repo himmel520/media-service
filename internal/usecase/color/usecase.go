@@ -5,14 +5,12 @@ import (
 
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
-	"github.com/sirupsen/logrus"
 )
 
 type (
 	ColorUC struct {
 		db   DBXT
 		repo ColorRepo
-		log  *logrus.Logger
 	}
 
 	DBXT interface {
@@ -29,10 +27,9 @@ type (
 	}
 )
 
-func New(db DBXT, repo ColorRepo, log *logrus.Logger) *ColorUC {
+func New(db DBXT, repo ColorRepo) *ColorUC {
 	return &ColorUC{
 		db:   db,
 		repo: repo,
-		log:  log,
 	}
 }

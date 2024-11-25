@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminColorsIDDelete(ctx context.Context, params api.V1AdminColorsIDDeleteParams) (api.V1AdminColorsIDDeleteRes, error) {
@@ -16,7 +18,9 @@ func (h *Handler) V1AdminColorsIDDelete(ctx context.Context, params api.V1AdminC
 	case errors.Is(err, repoerr.ErrColorDependencyExist):
 		return &api.V1AdminColorsIDDeleteConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.ErrFields(err, map[string]string{
+			"req_id": middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 

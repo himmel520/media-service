@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminColorsIDPut(ctx context.Context, req *api.ColorPut, params api.V1AdminColorsIDPutParams) (api.V1AdminColorsIDPutRes, error) {
@@ -26,7 +28,9 @@ func (h *Handler) V1AdminColorsIDPut(ctx context.Context, req *api.ColorPut, par
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		return &api.V1AdminColorsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.ErrFields(err, map[string]string{
+			"req_id": middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 

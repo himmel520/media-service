@@ -7,6 +7,7 @@ import (
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminImagesIDPut(ctx context.Context, req *api.ImagePut, params api.V1AdminImagesIDPutParams) (api.V1AdminImagesIDPutRes, error) {
@@ -27,7 +28,7 @@ func (h *Handler) V1AdminImagesIDPut(ctx context.Context, req *api.ImagePut, par
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		return &api.V1AdminImagesIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 

@@ -4,9 +4,11 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminAdsIDPut(ctx context.Context, req *api.AdPut, params api.V1AdminAdsIDPutParams) (api.V1AdminAdsIDPutRes, error) {
@@ -31,7 +33,9 @@ func (h *Handler) V1AdminAdsIDPut(ctx context.Context, req *api.AdPut, params ap
 	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
 		return &api.V1AdminAdsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.ErrFields(err, map[string]string{
+			"req_id": middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 

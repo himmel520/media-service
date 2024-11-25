@@ -4,8 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1AdminTgsIDDelete(ctx context.Context, params api.V1AdminTgsIDDeleteParams) (api.V1AdminTgsIDDeleteRes, error) {
@@ -16,7 +18,9 @@ func (h *Handler) V1AdminTgsIDDelete(ctx context.Context, params api.V1AdminTgsI
 	case errors.Is(err, repoerr.ErrTGDependencyExist):
 		return &api.V1AdminTgsIDDeleteConflict{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.ErrFields(err, map[string]interface{}{
+			"req_id": middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 

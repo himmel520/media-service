@@ -1,6 +1,10 @@
 package imgUC
 
-import "context"
+import (
+	"context"
+
+	log "github.com/youroffer/logger"
+)
 
 const (
 	logoCachePrefix  = "logo:*"
@@ -9,6 +13,6 @@ const (
 
 func (uc *ImgUC) DeleteCache(ctx context.Context) {
 	if err := uc.cache.Delete(context.Background(), logoCachePrefix); err != nil {
-		uc.log.Error(err)
+		log.Err(err)
 	}
 }

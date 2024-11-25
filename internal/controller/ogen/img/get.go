@@ -9,6 +9,7 @@ import (
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
 	"github.com/himmel520/media-service/internal/usecase"
+	log "github.com/youroffer/logger"
 )
 
 func (h *Handler) V1LogosGet(ctx context.Context) (api.V1LogosGetRes, error) {
@@ -18,7 +19,7 @@ func (h *Handler) V1LogosGet(ctx context.Context) (api.V1LogosGetRes, error) {
 	case errors.Is(err, repoerr.ErrImageNotFound):
 		return &api.V1LogosGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 
@@ -35,7 +36,7 @@ func (h *Handler) V1AdminImagesGet(ctx context.Context, params api.V1AdminImages
 	case errors.Is(err, repoerr.ErrImageNotFound):
 		return &api.V1AdminImagesGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		h.log.Error(err)
+		log.Err(err)
 		return nil, err
 	}
 

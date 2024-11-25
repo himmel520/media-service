@@ -18,7 +18,6 @@ generate.api: $(ogen)
 	$(ogen) --loglevel error --clean --config .ogen.yml --target ./api/oas ./api/openapi.yml
 	docker run --rm -v `pwd`:/spec redocly/cli bundle ./api/openapi.yml > ./api/bundle.yml
 
-
 # COMPOSE
 .PHONY: compose.up
 compose.up:

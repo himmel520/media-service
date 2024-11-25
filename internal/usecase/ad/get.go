@@ -2,6 +2,7 @@ package adUC
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
@@ -14,12 +15,12 @@ func (uc *AdUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Ads
 		Limit:  params.PerPage,
 		Offset: params.Page * params.PerPage})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo get: %w", err)
 	}
 
 	count, err := uc.repo.Count(ctx, uc.db.DB())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("repo count: %w", err)
 	}
 
 	return &entity.AdsResp{
@@ -32,7 +33,7 @@ func (uc *AdUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Ads
 
 func (uc *AdUC) GetWithFilter(ctx context.Context, params usecase.AdvFilterParams) ([]*entity.AdvResp, error) {
 	return uc.repo.GetWithFilter(ctx, uc.db.DB(), repository.AdvFilterParams{
-		Posts: params.Posts,
+		Posts:    params.Posts,
 		Priority: params.Priority,
 	})
 }

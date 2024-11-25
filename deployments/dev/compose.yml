@@ -30,7 +30,7 @@ services:
   media:
     restart: always
     container_name: media
-    command: "air -c .air.toml"
+    command: "air -c .air.toml -- -loglevel=debug"
     build:
       context: ../../
       dockerfile: deployments/dev/Dockerfile
