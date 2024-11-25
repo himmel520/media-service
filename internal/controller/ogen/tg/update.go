@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
@@ -27,7 +28,9 @@ func (h *Handler) V1AdminTgsIDPut(ctx context.Context, req *api.TgPut, params ap
 	case errors.Is(err, repoerr.ErrTGExist):
 		return &api.V1AdminTgsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.Err(err)
+		log.ErrFields(err, map[string]string{
+			"req_id": middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 
