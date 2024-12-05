@@ -6,12 +6,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strings"
+
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
 )
 
-const advCachePrefix = "advs:*"
-
 func (uc *AdUC) DeleteCache(ctx context.Context) error {
-	return uc.cache.Delete(ctx, advCachePrefix)
+	return uc.cache.Delete(ctx, cache.AdvPrefixKey)
 }
 
 func generateCacheKeyAdv(limit, offset int, posts, priority []string) string {
@@ -21,5 +21,5 @@ func generateCacheKeyAdv(limit, offset int, posts, priority []string) string {
 	hasher.Write([]byte(key))
 	hash := hex.EncodeToString(hasher.Sum(nil))
 
-	return advCachePrefix + hash
+	return cache.AdvPrefixKey + hash
 }
