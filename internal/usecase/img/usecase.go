@@ -31,5 +31,5 @@ type (
 )
 
 func New(db DBXT, repo ImgRepo, cache cache.Cache) *ImgUC {
-	return &ImgUC{db: db, repo: repo}
+	return &ImgUC{db: db, repo: repo, cache: cache}
 }

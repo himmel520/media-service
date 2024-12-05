@@ -2,18 +2,17 @@ package imgUC
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/lib/paging"
 	"github.com/himmel520/media-service/internal/usecase"
+	log "github.com/youroffer/logger"
 )
-
-func (uc *ImgUC) GetByID(ctx context.Context, id int) (*entity.Image, error) {
-	// return uc.repo.GetByID(ctx, id)
-	return nil, nil
-}
 
 func (uc *ImgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.ImagesResp, error) {
 	images, err := uc.repo.Get(ctx, uc.db.DB(), repository.PaginationParams{
@@ -37,5 +36,26 @@ func (uc *ImgUC) Get(ctx context.Context, params usecase.PageParams) (*entity.Im
 }
 
 func (uc *ImgUC) GetAllLogos(ctx context.Context) (entity.LogosResp, error) {
-	return uc.repo.GetAllLogos(ctx, uc.db.DB())
+	var logos entity.LogosResp
+	
+	bytes, err := uc.cache.Get(ctx, cache.AllLogoskey)
+	if err != nil {
+		if !errors.Is(err, cache.ErrKeyNotFound) {
+			log.Err(err)
+		}
+		
+		logos, err := uc.repo.GetAllLogos(ctx, uc.db.DB())
+		if err != nil {
+			return nil, err
+		}
+		
+		if err = uc.cache.Set(ctx, cache.AllLogoskey, logos); err != nil {
+			log.ErrMsg(err, "get all logos cache")
+		}
+		
+		return logos, nil
+	}
+
+	err = json.Unmarshal([]byte(bytes), &logos)
+	return logos, err
 }

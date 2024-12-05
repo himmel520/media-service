@@ -8,6 +8,14 @@ import (
 	goredis "github.com/redis/go-redis/v9"
 )
 
+// Cache keys
+const (
+	AdvPrefixKey = "advs:*"
+
+	LogoPrefixKey = "logo:*"
+	AllLogoskey   = "logo:all"
+)
+
 func NewRedis(conn string) (*goredis.Client, error) {
 	opt, err := goredis.ParseURL(conn)
 	if err != nil {
@@ -43,7 +51,6 @@ func (r *Redis) Set(ctx context.Context, key string, value any) error {
 func (r *Redis) Get(ctx context.Context, key string) (string, error) {
 	val, err := r.rdb.Get(ctx, key).Result()
 	if err != nil {
-
 		if err == goredis.Nil {
 			return "", ErrKeyNotFound
 		}
