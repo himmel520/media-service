@@ -5,7 +5,10 @@ type (
 		uc AuthUsecase
 	}
 
-	AuthUsecase interface{}
+	AuthUsecase interface{
+		GetUserRoleFromToken(jwtToken string) (string, error) 
+		IsUserAdmin(userRole string) bool
+	}
 )
 
 func New(uc AuthUsecase) *Handler {
