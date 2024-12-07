@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/himmel520/media-service/internal/entity"
@@ -21,7 +22,7 @@ import (
 func generateCacheKeyAdv(posts []string, priority []int) string {
 	key := fmt.Sprintf("%s:%s",
 		strings.Join(posts, ","),
-		strings.Join(convert.ApplyToSlice(priority, func(i int) string { return string(i) }), ","))
+		strings.Join(convert.ApplyToSlice(priority, func(i int) string { return strconv.Itoa(i) }), ","))
 
 	hasher := md5.New()
 	hasher.Write([]byte(key))
