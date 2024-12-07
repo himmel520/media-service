@@ -33,8 +33,8 @@ func (h *Handler) V1AdminAdsIDPut(ctx context.Context, req *api.AdPut, params ap
 	case errors.Is(err, repoerr.ErrAdvDependencyNotExist):
 		return &api.V1AdminAdsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

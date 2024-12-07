@@ -28,8 +28,8 @@ func (h *Handler) V1AdminTgsIDPut(ctx context.Context, req *api.TgPut, params ap
 	case errors.Is(err, repoerr.ErrTGExist):
 		return &api.V1AdminTgsIDPutConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err,log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

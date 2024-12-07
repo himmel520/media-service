@@ -22,8 +22,8 @@ func (h *Handler) V1AdminColorsGet(ctx context.Context, params api.V1AdminColors
 	case errors.Is(err, repoerr.ErrColorNotFound):
 		return &api.V1AdminColorsGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

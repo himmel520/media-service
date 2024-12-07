@@ -18,8 +18,8 @@ func (h *Handler) V1AdminTgsIDDelete(ctx context.Context, params api.V1AdminTgsI
 	case errors.Is(err, repoerr.ErrTGDependencyExist):
 		return &api.V1AdminTgsIDDeleteConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]interface{}{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

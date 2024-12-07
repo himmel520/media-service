@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/go-chi/chi/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 	"github.com/himmel520/media-service/internal/controller/ogen"
 	"github.com/himmel520/media-service/internal/entity"
@@ -19,7 +20,9 @@ func (h *Handler) V1LogosGet(ctx context.Context) (api.V1LogosGetRes, error) {
 	case errors.Is(err, repoerr.ErrImageNotFound):
 		return &api.V1LogosGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.Err(err)
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 
@@ -36,7 +39,9 @@ func (h *Handler) V1AdminImagesGet(ctx context.Context, params api.V1AdminImages
 	case errors.Is(err, repoerr.ErrImageNotFound):
 		return &api.V1AdminImagesGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.Err(err)
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
+		})
 		return nil, err
 	}
 

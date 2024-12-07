@@ -21,8 +21,8 @@ func (h *Handler) V1AdminTgsPost(ctx context.Context, req *api.TgPost) (api.V1Ad
 	case errors.Is(err, repoerr.ErrTGExist):
 		return &api.V1AdminTgsPostConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

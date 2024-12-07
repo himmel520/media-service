@@ -638,8 +638,7 @@ type Image struct {
 	// Название изображения.
 	Title string `json:"title"`
 	// URL изображения.
-	URL url.URL `json:"url"`
-	// Тип изображения (например, 'adv' или 'logo').
+	URL  url.URL   `json:"url"`
 	Type ImageType `json:"type"`
 }
 
@@ -851,6 +850,7 @@ func (s *ImagePutType) UnmarshalText(data []byte) error {
 }
 
 // Тип изображения (например, 'adv' или 'logo').
+// Ref: #
 type ImageType string
 
 const (

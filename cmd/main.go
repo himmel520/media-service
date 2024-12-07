@@ -60,7 +60,7 @@ func main() {
 		log.FatalMsg(err, "unable to connect to cache")
 	}
 	defer rdb.Close()
-	cache := cache.Init(rdb, cfg.Cache.Exp)
+	cache := cache.NewCache(rdb, cfg.Cache.Exp)
 
 	// repo
 	tgRepo := tgRepo.New()

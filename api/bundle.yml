@@ -940,6 +940,12 @@ components:
           - title
           - url
           - type
+    image_type:
+      type: string
+      description: Тип изображения (например, 'adv' или 'logo')
+      enum:
+        - adv
+        - logo
     image:
       type: object
       properties:
@@ -957,11 +963,7 @@ components:
           format: uri
           example: https://example.com/logo.png
         type:
-          type: string
-          description: Тип изображения (например, 'adv' или 'logo')
-          enum:
-            - adv
-            - logo
+          $ref: '#/components/schemas/image_type'
       required:
         - id
         - title

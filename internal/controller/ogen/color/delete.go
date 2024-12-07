@@ -18,8 +18,8 @@ func (h *Handler) V1AdminColorsIDDelete(ctx context.Context, params api.V1AdminC
 	case errors.Is(err, repoerr.ErrColorDependencyExist):
 		return &api.V1AdminColorsIDDeleteConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

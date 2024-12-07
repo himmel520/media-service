@@ -14,9 +14,7 @@ properties:
     format: uri
     example: "https://example.com/logo.png"
   type:
-    type: string
-    description: Тип изображения (например, 'adv' или 'logo')
-    enum: [adv, logo]
+    $ref: "../../properties/image_type.yml"
 required:
   - id 
   - title 
