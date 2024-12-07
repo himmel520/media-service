@@ -9,8 +9,9 @@ import (
 
 type (
 	TgUC struct {
-		db   DBXT
-		repo TgRepo
+		db    DBXT
+		repo  TgRepo
+		cache Cache
 	}
 
 	DBXT interface {
@@ -31,9 +32,10 @@ type (
 	}
 )
 
-func New(db DBXT, repo TgRepo) *TgUC {
+func New(db DBXT, repo TgRepo, cache Cache) *TgUC {
 	return &TgUC{
-		db:   db,
-		repo: repo,
+		db:    db,
+		repo:  repo,
+		cache: cache,
 	}
 }

@@ -3,6 +3,10 @@ package imgUC
 import (
 	"context"
 	"fmt"
+
+	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
+	log "github.com/youroffer/logger"
 )
 
 func (uc *ImgUC) Delete(ctx context.Context, id int) error {
@@ -15,7 +19,11 @@ func (uc *ImgUC) Delete(ctx context.Context, id int) error {
 		return fmt.Errorf("delete img: %w", err)
 	}
 
-	uc.DeleteImageCache(ctx, imageType)
-	
+	if imageType == entity.ImageTypeLogo {
+		if err := uc.cache.Delete(context.Background(), cache.LogoPrefixKey); err != nil {
+			log.ErrMsg(err, "delete logo cache")
+		}
+	}
+
 	return nil
 }
