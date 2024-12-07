@@ -25,6 +25,10 @@ type (
 		Delete(ctx context.Context, qe repository.Querier, id int) error
 		Count(ctx context.Context, qe repository.Querier) (int, error)
 	}
+
+	Cache interface {
+		Delete(ctx context.Context, prefix string) error
+	}
 )
 
 func New(db DBXT, repo TgRepo) *TgUC {

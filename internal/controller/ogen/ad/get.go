@@ -28,8 +28,8 @@ func (h *Handler) V1AdsGet(ctx context.Context, params api.V1AdsGetParams) (api.
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		return &api.V1AdsGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]interface{}{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}
@@ -47,8 +47,8 @@ func (h *Handler) V1AdminAdsGet(ctx context.Context, params api.V1AdminAdsGetPar
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		return &api.V1AdminAdsGetNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]interface{}{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

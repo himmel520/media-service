@@ -21,8 +21,8 @@ func (h *Handler) V1AdminColorsPost(ctx context.Context, req *api.ColorPost) (ap
 	case errors.Is(err, repoerr.ErrColorHexExist):
 		return &api.V1AdminColorsPostConflict{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]string{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}

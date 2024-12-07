@@ -7,6 +7,13 @@ import (
 	"github.com/himmel520/media-service/internal/lib/convert"
 )
 
+type ImageType string
+
+var (
+	ImageTypeAdv  ImageType = "adv"
+	ImageTypeLogo ImageType = "logo"
+)
+
 type ImageUpdate struct {
 	Url   Optional[string] `json:"url"`
 	Title Optional[string] `json:"title"`
@@ -18,10 +25,10 @@ func (i *ImageUpdate) IsSet() bool {
 }
 
 type Image struct {
-	ID    int    `json:"id"`
-	Url   string `json:"url"`
-	Title string `json:"title"`
-	Type  string `json:"type"`
+	ID    int       `json:"id"`
+	Url   string    `json:"url"`
+	Title string    `json:"title"`
+	Type  ImageType `json:"type"`
 }
 
 func ImageToApi(i *Image) *api.Image {
@@ -55,7 +62,7 @@ func LogosRespToApi(logos LogosResp) *api.LogosResp {
 			Title: logo.Title,
 			URL:   *url,
 			// TODO: добавить проверку на тип
-			Type:  api.LogosRespItemType(logo.Type),
+			Type: api.LogosRespItemType(logo.Type),
 		}
 	}
 

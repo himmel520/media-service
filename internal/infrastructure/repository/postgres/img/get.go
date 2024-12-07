@@ -2,12 +2,14 @@ package imgRepo
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/himmel520/media-service/internal/entity"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
 	"github.com/himmel520/media-service/internal/infrastructure/repository/repoerr"
+	"github.com/jackc/pgx/v5"
 )
 
 func (r *ImgRepo) Get(ctx context.Context, qe repository.Querier, params repository.PaginationParams) ([]*entity.Image, error) {
@@ -94,4 +96,24 @@ func (r *ImgRepo) GetAllLogos(ctx context.Context, qe repository.Querier) (entit
 	}
 
 	return images, err
+}
+
+func (r ImgRepo) GetImageTypeByID(ctx context.Context, qe repository.Querier, id int) (entity.ImageType, error) {
+	query, args, err := squirrel.Select("type").
+		From("images").
+		Where(squirrel.Eq{"id": id}).
+		PlaceholderFormat(squirrel.Dollar).
+		ToSql()
+	if err != nil {
+		return "", err
+	}
+
+	var imageType entity.ImageType
+	err = qe.QueryRow(ctx, query, args...).Scan(&imageType)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", repoerr.ErrImageNotFound
+	}
+
+	return imageType, err
+
 }

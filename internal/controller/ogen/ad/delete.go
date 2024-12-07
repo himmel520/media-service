@@ -17,8 +17,8 @@ func (h *Handler) V1AdminAdsIDDelete(ctx context.Context, params api.V1AdminAdsI
 	case errors.Is(err, repoerr.ErrAdvNotFound):
 		return &api.V1AdminAdsIDDeleteNotFound{Message: err.Error()}, nil
 	case err != nil:
-		log.ErrFields(err, map[string]interface{}{
-			"req_id": middleware.GetReqID(ctx),
+		log.ErrFields(err, log.Fields{
+			log.RequestID: middleware.GetReqID(ctx),
 		})
 		return nil, err
 	}
