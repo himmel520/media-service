@@ -70,8 +70,8 @@ func main() {
 
 	// uc
 	authUC := authUC.New(cfg.Srv.JWT.PublicKey)
-	tgUC := tgUC.New(dbtx, tgRepo)
-	colorUC := colorUC.New(dbtx, colorRepo)
+	tgUC := tgUC.New(dbtx, tgRepo, cache)
+	colorUC := colorUC.New(dbtx, colorRepo, cache)
 	imgUC := imgUC.New(dbtx, imgRepo, cache)
 	adUC := adUC.New(dbtx, adRepo, cache)
 

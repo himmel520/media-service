@@ -11,6 +11,7 @@ type (
 	ColorUC struct {
 		db   DBXT
 		repo ColorRepo
+		cache Cache
 	}
 
 	DBXT interface {
@@ -31,9 +32,10 @@ type (
 	}
 )
 
-func New(db DBXT, repo ColorRepo) *ColorUC {
+func New(db DBXT, repo ColorRepo, cache Cache) *ColorUC {
 	return &ColorUC{
 		db:   db,
 		repo: repo,
+		cache: cache,
 	}
 }

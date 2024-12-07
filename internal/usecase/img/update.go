@@ -5,6 +5,8 @@ import (
 	"fmt"
 
 	"github.com/himmel520/media-service/internal/entity"
+	"github.com/himmel520/media-service/internal/infrastructure/cache"
+	log "github.com/youroffer/logger"
 )
 
 func (uc *ImgUC) Update(ctx context.Context, id int, image *entity.ImageUpdate) (*entity.Image, error) {
@@ -13,7 +15,16 @@ func (uc *ImgUC) Update(ctx context.Context, id int, image *entity.ImageUpdate) 
 		return nil, fmt.Errorf("update image: %w", err)
 	}
 
-	uc.DeleteImageCache(ctx, newImage.Type)
+	switch newImage.Type {
+	case entity.ImageTypeLogo:
+		err = uc.cache.Delete(context.Background(), cache.LogoPrefixKey)
+	case entity.ImageTypeAdv:
+		err = uc.cache.Delete(context.Background(), cache.AdvPrefixKey)
+	}
+
+	if err != nil {
+		log.ErrMsgf(err, "delete %s cache", newImage.Type)
+	}
 
 	return newImage, nil
 }

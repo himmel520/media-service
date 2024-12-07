@@ -50,7 +50,7 @@ func (uc *ImgUC) GetAllLogos(ctx context.Context) (entity.LogosResp, error) {
 		}
 		
 		if err = uc.cache.Set(ctx, cache.AllLogoskey, logos); err != nil {
-			log.ErrMsg(err, "get all logos cache")
+			log.ErrMsg(err, "set all logos cache")
 		}
 		
 		return logos, nil

@@ -4,9 +4,7 @@ import (
 	"context"
 
 	"github.com/himmel520/media-service/internal/entity"
-	"github.com/himmel520/media-service/internal/infrastructure/cache"
 	"github.com/himmel520/media-service/internal/infrastructure/repository"
-	log "github.com/youroffer/logger"
 )
 
 type (
@@ -40,22 +38,4 @@ type (
 
 func New(db DBXT, repo ImgRepo, cache Cache) *ImgUC {
 	return &ImgUC{db: db, repo: repo, cache: cache}
-}
-
-func (uc *ImgUC) DeleteImageCache(ctx context.Context, imageType entity.ImageType) {
-	var err error
-
-	switch imageType {
-	case entity.ImageTypeLogo:
-		err = uc.cache.Delete(context.Background(), cache.LogoPrefixKey)
-
-	case entity.ImageTypeAdv:
-		err = uc.cache.Delete(context.Background(), cache.AdvPrefixKey)
-	}
-
-	if err != nil {
-		log.ErrFieldsMsg(err, "delete image cache", log.Fields{
-			"image_type": imageType,
-		})
-	}
 }
