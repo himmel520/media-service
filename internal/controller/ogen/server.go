@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-chi/chi"
-	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	api "github.com/himmel520/media-service/api/oas"
 )
 
@@ -31,6 +31,8 @@ func NewServer(h *Handler, addr string) (*Server, error) {
 	mux.Use(middleware.Logger)
 	mux.Use(middleware.Recoverer)
 
+	swaggerUI(mux)
+	
 	mux.Mount("/", apiServer)
 
 	return &Server{
