@@ -8,11 +8,11 @@ import (
 )
 
 func swaggerUI(mux *chi.Mux) {
-	mux.Get("/swagger/bundle.yaml", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./api/bundle.yaml")
+	mux.Get("/swagger/bundle.yml", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./api/bundle.yml")
 	})
 
 	mux.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL("/swagger/bundle.yaml"),
+		httpSwagger.URL("/swagger/bundle.yml"),
 	))
 }
