@@ -11,7 +11,7 @@ make setup
 2. Важно добавить файл `public.key` в папку ./config/jwt
 2. Настройка .env
 ```bash
-cp .env.example .env
+cp example.env .env
 ```
 3. Запуск сервисов
 ```bash
