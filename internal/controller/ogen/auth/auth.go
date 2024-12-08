@@ -13,9 +13,9 @@ func (h *Handler) HandleAdminBearerAuth(ctx context.Context, operationName strin
 		return ctx, err
 	}
 
-	if !h.uc.IsUserAdmin(role){
+	if !h.uc.IsUserAdmin(role) {
 		return nil, errors.New("not enough permissions")
 	}
-	
+
 	return ctx, nil
 }

@@ -6,8 +6,8 @@ type (
 	}
 
 	AuthUsecase interface{
-		GetUserRoleFromToken(jwtToken string) (string, error) 
-		IsUserAdmin(userRole string) bool
+		GetUserRoleFromToken(jwtToken string) (int, error) 
+		IsUserAdmin(userRole int) bool
 	}
 )
 

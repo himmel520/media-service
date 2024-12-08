@@ -1,3 +1,7 @@
 package entity
 
-const RoleAdmin  = "admin"
+const (
+	RoleAnonym = iota
+	RoleUser
+	RoleAdmin
+)
